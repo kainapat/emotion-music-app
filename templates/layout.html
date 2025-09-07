@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>{% block title %}Emotion Path{% endblock %}</title>
+</head>
+<body class="bg-gradient-to-b from-indigo-50 to-pink-50 min-h-screen">
+  <!-- Navbar -->
+  <nav class="bg-white shadow p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-pink-600">🎶 Emotion Path</h1>
+    <div class="space-x-6">
+      <a href="/" class="text-gray-600 hover:text-pink-500">วิเคราะห์เพลง</a>
+      <a href="/search" class="text-gray-600 hover:text-pink-500">ค้นหาเพลง</a>
+      <a href="/explore" class="text-gray-600 hover:text-pink-500">สำรวจ</a>
+      <a href="/dashboard" class="text-gray-600 hover:text-pink-500">แดชบอร์ด</a>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <div class="max-w-6xl mx-auto p-6">
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

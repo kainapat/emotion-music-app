@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block title %}ค้นหาเพลง - Emotion Path{% endblock %}
+{% block content %}
+
+<h2 class="text-xl font-semibold mb-4">🔍 ค้นหาเพลงตามเส้นทางอารมณ์</h2>
+
+<form method="post" class="space-y-2 mb-6">
+  <input name="query" placeholder="เช่น: เศร้า → หวัง"
+         class="border p-2 w-full rounded">
+  <button class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded">ค้นหา</button>
+</form>
+
+{% if songs %}
+  <h3 class="text-lg font-semibold mb-3">ผลลัพธ์การค้นหา</h3>
+  <div class="grid grid-cols-2 gap-4">
+    {% for s in songs %}
+      <div class="bg-white p-4 rounded shadow">
+        <h4 class="font-bold text-lg">
+          <a href="/song/{{ s[0] }}" class="hover:underline text-purple-700">{{ s[1] }}</a>
+        </h4>
+        <p class="text-sm text-gray-500">
+          👁 {{ s[2] }} 👍 {{ s[3] }} 📅 {{ s[4] }}
+        </p>
+        <div class="mt-2">
+          {{ s[5]|safe }}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  {% if request.method == "POST" %}
+    <p class="text-gray-500">❌ ไม่พบเพลงที่ตรงกับเส้นทางอารมณ์ "{{ request.form['query'] }}"</p>
+  {% endif %}
+{% endif %}
+
+{% endblock %}

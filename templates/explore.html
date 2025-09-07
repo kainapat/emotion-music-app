@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block title %}สำรวจเส้นทางอารมณ์ - Emotion Path{% endblock %}
+{% block content %}
+
+<h2 class="text-2xl font-bold mb-4">📚 สำรวจเส้นทางอารมณ์</h2>
+
+<!-- ชิปอารมณ์ยอดนิยม -->
+<div class="bg-white/70 backdrop-blur p-5 rounded-xl shadow mb-6">
+  <h3 class="font-semibold mb-3">กรองผลลัพธ์</h3>
+  <div class="flex flex-wrap gap-2">
+    {% for emo, cnt in top_emotions %}
+      <span class="px-3 py-1 rounded-full text-sm bg-pink-100 text-pink-700">
+        {{ emo }} <span class="text-gray-500">×{{ cnt }}</span>
+      </span>
+    {% else %}
+      <span class="text-gray-500">ยังไม่มีข้อมูล</span>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <!-- Transition เด่นสุด -->
+  <div class="bg-white p-5 rounded-xl shadow">
+    <h3 class="font-semibold mb-3">เพลงที่ transition เด่นสุด</h3>
+    <ul class="list-disc ml-5 space-y-2">
+      {% for row in top_transition %}
+        <li>
+          <a href="/song/{{ row.id }}" class="font-medium text-purple-700 hover:underline">
+            {{ row.title }}
+          </a>
+          <span class="text-gray-600">
+            ({{ row.path }}) • เปลี่ยน {{ row.trans_cnt }} ครั้ง
+          </span>
+        </li>
+      {% else %}
+        <li class="text-gray-500">ยังไม่มีข้อมูล</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- เพลงอารมณ์คงที่ -->
+  <div class="bg-white p-5 rounded-xl shadow">
+    <h3 class="font-semibold mb-3">เพลงที่อารมณ์คงที่</h3>
+    <ul class="list-disc ml-5 space-y-2">
+      {% for row in stable_songs %}
+        <li>
+          <a href="/song/{{ row.id }}" class="font-medium text-purple-700 hover:underline">
+            {{ row.title }}
+          </a>
+          <span class="text-gray-600">({{ row.emotion }} ทั้งเพลง)</span>
+        </li>
+      {% else %}
+        <li class="text-gray-500">ยังไม่มีข้อมูล</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{% endblock %}

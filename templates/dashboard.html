@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% block title %}แดชบอร์ด - Emotion Path{% endblock %}
+{% block content %}
+
+<h2 class="text-xl font-semibold mb-6">📈 แดชบอร์ดการวิเคราะห์</h2>
+
+<!-- สรุปข้อมูล -->
+<div class="grid grid-cols-4 gap-6 mb-6">
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-gray-500">เพลงทั้งหมด</p>
+    <p class="text-2xl font-bold text-pink-600">{{ stats.total_songs }}</p>
+  </div>
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-gray-500">การวิเคราะห์ทั้งหมด</p>
+    <p class="text-2xl font-bold text-purple-600">{{ stats.total_segments }}</p>
+  </div>
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-gray-500">คะแนนอารมณ์เฉลี่ย</p>
+    <p class="text-2xl font-bold text-indigo-600">{{ stats.avg_score }}</p>
+  </div>
+  <div class="bg-white p-4 rounded-xl shadow">
+    <p class="text-gray-500">อารมณ์ยอดนิยม</p>
+    <p class="text-2xl font-bold text-green-600">{{ stats.popular_emotion }}</p>
+  </div>
+</div>
+
+<!-- กราฟ -->
+<div class="grid grid-cols-2 gap-6">
+  <div class="bg-white rounded-xl shadow p-6">
+    <h3 class="font-semibold mb-4">การกระจายอารมณ์</h3>
+    <canvas id="pieChart"></canvas>
+  </div>
+  <div class="bg-white rounded-xl shadow p-6">
+    <h3 class="font-semibold mb-4">จำนวนแต่ละอารมณ์</h3>
+    <canvas id="barChart"></canvas>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const emotions = {{ stats.emotion_stats | map(attribute=0) | list | tojson | safe }};
+  const counts = {{ stats.emotion_stats | map(attribute=1) | list | tojson | safe }};
+  
+  console.log("Emotions:", emotions);
+  console.log("Counts:", counts);
+
+  // Pie Chart
+  new Chart(document.getElementById("pieChart"), {
+    type: "pie",
+    data: {
+      labels: emotions,
+      datasets: [{
+        data: counts,
+        backgroundColor: ["#f87171","#fb923c","#facc15","#4ade80","#60a5fa","#a78bfa","#f472b6"]
+      }]
+    }
+  });
+
+  // Bar Chart
+  new Chart(document.getElementById("barChart"), {
+    type: "bar",
+    data: {
+      labels: emotions,
+      datasets: [{
+        label: "จำนวน",
+        data: counts,
+        backgroundColor: "#6366f1"
+      }]
+    },
+    options: {
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+</script>
+
+{% endblock %}

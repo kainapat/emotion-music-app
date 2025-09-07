@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block title %}วิเคราะห์เพลง - Emotion Path{% endblock %}
+{% block content %}
+
+<!-- เพิ่มเพลงใหม่ -->
+<div class="bg-white rounded-xl shadow p-6 mb-6">
+  <h2 class="text-xl font-semibold mb-4">➕ เพิ่มเพลงใหม่</h2>
+  {% if error %}
+    <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+      {{ error }}
+    </div>
+  {% endif %}
+  <form method="post" class="grid grid-cols-2 gap-4">
+    <input name="youtube" placeholder="ลิงก์ YouTube" class="border p-2 rounded col-span-2">
+    <textarea name="lyrics" placeholder="เนื้อเพลง" class="border p-2 rounded col-span-2"></textarea>
+    <button class="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded col-span-2">
+      วิเคราะห์อารมณ์
+    </button>
+  </form>
+</div>
+
+<!-- เพลงทั้งหมด -->
+<h2 class="text-xl font-semibold mb-4">🎵 เพลงทั้งหมด</h2>
+<div class="grid grid-cols-3 gap-6">
+  {% for s in songs %}
+  <div class="bg-white p-3 rounded shadow">
+    <p class="font-bold">
+      <a href="/song/{{ s[0] }}" class="text-blue-600 hover:underline">
+        {{ s[1] }}
+      </a>
+    </p>
+    <p class="text-sm text-gray-500">👁 {{ s[2] }} 👍 {{ s[3] }} 📅 {{ s[4] }}</p>
+    <div class="mt-2">
+      {{ s[5]|safe }}
+    </div>
+    <!-- ปุ่มลบ -->
+    <form action="/song/{{ s[0] }}/delete" method="post"
+          onsubmit="return confirm('❌ ต้องการลบเพลง {{ s[1] }} จริงหรือไม่?');">
+      <button type="submit"
+              class="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+        🗑️ ลบ
+      </button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
