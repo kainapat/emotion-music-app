@@ -1,7 +1,12 @@
 from googleapiclient.discovery import build
 import re
+import os
+from dotenv import load_dotenv
 
-API_KEY = "AIzaSyDXveiJaVtM9Lhzdq5QW9_5jgeVfXhOTyI"   # ใส่ API Key ของคุณ
+# Load environment variables from .env file
+load_dotenv()
+
+API_KEY = os.getenv("YOUTUBE_API_KEY")
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
