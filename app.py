@@ -10,13 +10,13 @@ from analysis import build_trajectory, plot_interactive_trajectory
 
 # === Thai Emotion Aliases → Canonical Labels ===
 TH_EMO_ALIASES = {
-    "เศร้า": {"เศร้า", "เสียใจ", "หม่น", "หมอง", "หดหู่", "ซึม", "ร้องไห้", "เหงา"},
-    "หวัง": {"หวัง", "ความหวัง", "มีความหวัง", "เริ่มหวัง"},
-    "สุข": {"สุข", "มีความสุข", "ร่าเริง", "สดใส", "สนุก", "แฮปปี้", "ยิ้ม"},
-    "สงบ": {"สงบ", "นิ่ง", "ใจเย็น", "เย็น", "ผ่อนคลาย", "ชิล"},
-    "โกรธ": {"โกรธ", "โมโห", "เดือด", "เกรี้ยวกราด"},
-    "ตื่นเต้น": {"ตื่นเต้น", "เร้าใจ", "พีค", "เข้มข้น", "ฮึกเหิม", "เร่งเร้า"},
-    "กังวล": {"กังวล", "เครียด", "กลัว", "หวาดกลัว", "ประหม่า"},
+    "เศร้า": {"เศร้า", "เสียใจ", "หม่น", "หมอง", "หดหู่", "ซึม", "ร้องไห้", "เหงา", "ทุกข์", "น้อยใจ", "ผิดหวัง"},
+    "หวัง": {"หวัง", "ความหวัง", "มีความหวัง", "เริ่มหวัง", "ฝัน", "กำลังใจ", "สู้", "พยายาม"},
+    "สุข": {"สุข", "มีความสุข", "ร่าเริง", "สดใส", "สนุก", "แฮปปี้", "ยิ้ม", "ดีใจ", "เบิกบาน", "ชื่นใจ"},
+    "สงบ": {"สงบ", "นิ่ง", "ใจเย็น", "เย็น", "ผ่อนคลาย", "ชิล", "สบาย", "พักผ่อน", "สงัด"},
+    "โกรธ": {"โกรธ", "โมโห", "เดือด", "เกรี้ยวกราด", "แค้น", "เคือง", "ฉุน", "เดือดดาล"},
+    "ตื่นเต้น": {"ตื่นเต้น", "เร้าใจ", "พีค", "เข้มข้น", "ฮึกเหิม", "เร่งเร้า", "มัน", "สะใจ", "เปรี้ยว"},
+    "กังวล": {"กังวล", "เครียด", "กลัว", "หวาดกลัว", "ประหม่า", "ลังเล", "ไม่แน่ใจ", "กระวนกระวาย"},
 }
 
 # reverse map: alias -> canonical
@@ -91,17 +91,49 @@ def parse_thai_emotion_query(q: str):
     if not q:
         return []
 
+    # ตรวจสอบรูปแบบลูกศร
+    if "→" in q or "->" in q:
+        # แทนที่ลูกศรให้เป็นรูปแบบเดียวกัน
+        q = q.replace("->", "→")
+        parts = [p.strip() for p in q.split("→") if p.strip()]
+        return [_canonize(p) for p in parts]
+
     # ลบคำทั่วไปที่ไม่จำเป็น
     q = re.sub(r"เพลงที่|ขอเพลง|แนว|โทน|อารมณ์|ช่วง", "", q)
     
-    # แยกคำสำคัญเกี่ยวกับอารมณ์
-    keywords = _extract_emotion_keywords(q)
+    # แยกคำโดย PyThaiNLP
+    tokens = word_tokenize(q)
     
-    # จัดเรียงตาม position
-    keywords.sort(key=lambda x: x["position"])
+    # สร้าง pattern สำหรับการเปลี่ยนแปลง
+    patterns = {
+        "start": ["เริ่ม", "ตอนแรก", "แรกๆ", "ช่วงแรก"],
+        "middle": ["แล้ว", "จากนั้น", "ต่อมา", "ตามด้วย"],
+        "end": ["สุดท้าย", "ตอนจบ", "ท้ายเพลง", "จบ"]
+    }
     
-    # แปลงเป็นรูปแบบเดิมเพื่อความเข้ากันได้
-    return [k["emotion"] for k in keywords]
+    emotions = []
+    current_position = None
+    
+    for i, token in enumerate(tokens):
+        # ตรวจหาคำบ่งชี้ตำแหน่ง
+        for pos, words in patterns.items():
+            if token in words:
+                current_position = pos
+                break
+                
+        # หาอารมณ์จากคำ
+        emotion = _canonize(token)
+        if emotion:
+            if current_position == "start":
+                emotions.insert(0, emotion)
+            else:
+                emotions.append(emotion)
+                
+    # ถ้าไม่มีอารมณ์ ลองหาคำที่เกี่ยวข้องกับอารมณ์ทั้งหมด
+    if not emotions:
+        emotions = [_canonize(t) for t in tokens if _canonize(t)]
+        
+    return [e for e in emotions if e]  # กรองเอาแต่ค่าที่ไม่ใช่ string ว่าง
 
 def soft_subseq_match(target, seq):
     """
@@ -110,6 +142,20 @@ def soft_subseq_match(target, seq):
     """
     if not target:
         return False
+        
+    # ทำให้เป็นภาษาเดียวกัน (ไทย)
+    from emotion_model import THAI_TO_ENG, ENG_TO_THAI
+    
+    def normalize_emotion(e):
+        # ถ้าเป็นภาษาอังกฤษ แปลงเป็นไทย
+        if e.lower() in ENG_TO_THAI:
+            return ENG_TO_THAI[e.lower()]
+        return e
+    
+    # แปลงทั้งสองฝั่งให้เป็นภาษาไทย
+    target = [normalize_emotion(t) for t in target]
+    seq = [normalize_emotion(s) for s in seq]
+    
     i = 0
     for s in seq:
         if i < len(target) and s == target[i]:
