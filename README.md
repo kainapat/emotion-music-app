@@ -111,8 +111,7 @@ emotion-music-app/
 │   ├── song_detail.html
 │   ├── explore.html
 │   └── dashboard.html
-└── static/               # Static assets
-    └── *.png            # Song thumbnails
+
 ```
 
 ## 🎯 How It Works
