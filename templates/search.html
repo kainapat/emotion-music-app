@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
-{% block title %}ค้นหาเพลง - Emotion Path{% endblock %}
-{% block content %}
 
+{% block title %}ค้นหาเพลง - Emotion Path{% endblock %}
+
+{% block content %}
 <div class="max-w-4xl mx-auto">
   <!-- หัวข้อและคำอธิบาย -->
   <div class="mb-6">
@@ -13,7 +14,7 @@
   <form method="post" class="mb-8">
     <div class="relative">
       <input name="query" 
-             value="{{ request.form['query'] }}"
+             value="{{ request.form['query'] or '' }}"
              placeholder="ลองค้นหา: เพลงที่เริ่มเศร้าแล้วค่อยๆเปลี่ยนเป็นความหวัง"
              class="w-full p-4 pr-32 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none">
       <button class="absolute right-2 top-2 px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:opacity-90 transition-opacity">
@@ -87,7 +88,6 @@
   {% endif %}
 </div>
 
-<!-- JavaScript สำหรับ copy ตัวอย่างการค้นหา -->
 <script>
 function setQuery(element) {
   const query = element.innerText.replace('• ', '').trim();
@@ -96,7 +96,6 @@ function setQuery(element) {
   input.focus();
 }
 </script>
-
 {% endblock %}
 
 {% endblock %}
