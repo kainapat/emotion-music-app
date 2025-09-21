@@ -86,14 +86,16 @@ def _extract_emotion_keywords(text: str) -> list:
 def parse_thai_emotion_query(q: str):
     """
     รับ query ภาษาธรรมชาติ → ลำดับอารมณ์พร้อมข้อมูลเพิ่มเติม
-    ตัวอย่าง: "เพลงที่เริ่มเศร้าแล้วค่อยๆเปลี่ยนเป็นหวัง"
+    รองรับ: 
+    1. แบบลูกศร "neutral → excited → sad"
+    2. แบบคงที่ "เพลงที่อารมณ์ neutral ตลอดทั้งเพลง"
+    3. แบบธรรมชาติ "เพลงที่เริ่มเศร้าแล้วค่อยๆเปลี่ยนเป็นหวัง"
     """
     if not q:
         return []
 
     # ตรวจสอบรูปแบบลูกศร
     if "→" in q or "->" in q:
-        # แทนที่ลูกศรให้เป็นรูปแบบเดียวกัน
         q = q.replace("->", "→")
         parts = [p.strip() for p in q.split("→") if p.strip()]
         return [_canonize(p) for p in parts]
@@ -101,14 +103,30 @@ def parse_thai_emotion_query(q: str):
     # ลบคำทั่วไปที่ไม่จำเป็น
     q = re.sub(r"เพลงที่|ขอเพลง|แนว|โทน|อารมณ์|ช่วง", "", q)
     
+    # ตรวจสอบรูปแบบอารมณ์คงที่
+    constant_patterns = [
+        r"(คงที่|ไม่เปลี่ยนแปลง|ตลอดทั้งเพลง|throughout|consistent|stable)",
+        r"(เหมือนเดิม|ทั้งเพลง|all the way|same emotion)"
+    ]
+    
+    for pattern in constant_patterns:
+        if re.search(pattern, q, re.IGNORECASE):
+            # ค้นหาอารมณ์เดียวที่กล่าวถึง
+            tokens = word_tokenize(q)
+            for token in tokens:
+                emotion = _canonize(token)
+                if emotion:
+                    # ส่งคืนอารมณ์เดียวกัน 3 ครั้งเพื่อแสดงความต่อเนื่อง
+                    return [emotion] * 3
+    
     # แยกคำโดย PyThaiNLP
     tokens = word_tokenize(q)
     
     # สร้าง pattern สำหรับการเปลี่ยนแปลง
     patterns = {
-        "start": ["เริ่ม", "ตอนแรก", "แรกๆ", "ช่วงแรก"],
-        "middle": ["แล้ว", "จากนั้น", "ต่อมา", "ตามด้วย"],
-        "end": ["สุดท้าย", "ตอนจบ", "ท้ายเพลง", "จบ"]
+        "start": ["เริ่ม", "ตอนแรก", "แรกๆ", "ช่วงแรก", "starts", "begins"],
+        "middle": ["แล้ว", "จากนั้น", "ต่อมา", "ตามด้วย", "then", "becomes", "changes to"],
+        "end": ["สุดท้าย", "ตอนจบ", "ท้ายเพลง", "จบ", "ends", "finally"]
     }
     
     emotions = []
@@ -117,7 +135,7 @@ def parse_thai_emotion_query(q: str):
     for i, token in enumerate(tokens):
         # ตรวจหาคำบ่งชี้ตำแหน่ง
         for pos, words in patterns.items():
-            if token in words:
+            if any(word in token.lower() for word in words):
                 current_position = pos
                 break
                 
@@ -137,8 +155,10 @@ def parse_thai_emotion_query(q: str):
 
 def soft_subseq_match(target, seq):
     """
-    soft subsequence: อนุญาตให้มีส่วนเกินใน seq ได้ แต่ลำดับ target ต้องเจอตามลำดับ
-    ex. target=['สงบ','ตื่นเต้น'], seq=['สงบ','สุข','ตื่นเต้น'] -> True
+    soft subsequence matching with support for:
+    1. Regular sequence matching: ['sad','happy'] matches ['sad','neutral','happy']
+    2. Constant emotion: ['neutral','neutral','neutral'] matches ['neutral'] * N
+    3. Mixed language support: 'sad' matches 'เศร้า'
     """
     if not target:
         return False
@@ -156,6 +176,14 @@ def soft_subseq_match(target, seq):
     target = [normalize_emotion(t) for t in target]
     seq = [normalize_emotion(s) for s in seq]
     
+    # กรณีอารมณ์คงที่: ถ้า target มีอารมณ์เดียวซ้ำกัน
+    if len(set(target)) == 1:
+        target_emotion = target[0]
+        # ต้องพบอารมณ์นั้นอย่างน้อย 80% ของความยาว sequence
+        emotion_count = sum(1 for s in seq if s == target_emotion)
+        return emotion_count >= 0.8 * len(seq)
+    
+    # กรณีปกติ: ค้นหาลำดับอารมณ์
     i = 0
     for s in seq:
         if i < len(target) and s == target[i]:
