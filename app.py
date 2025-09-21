@@ -74,13 +74,21 @@ def soft_subseq_match(target, seq):
 app = Flask(__name__)
 
 def db_query(query, args=(), fetch=False):
-    conn = sqlite3.connect("songs.db")
-    cur = conn.cursor()
-    cur.execute(query, args)
-    rows = cur.fetchall() if fetch else None
-    conn.commit()
-    conn.close()
-    return rows
+    conn = None
+    try:
+        conn = sqlite3.connect("songs.db")
+        cur = conn.cursor()
+        cur.execute(query, args)
+        rows = cur.fetchall() if fetch else None
+        conn.commit()
+        return rows
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        raise e
+    finally:
+        if conn:
+            conn.close()
 
 # ----------------------
 # Index (เพิ่มเพลง / วิเคราะห์)
@@ -105,31 +113,53 @@ def index():
                 return render_template("index.html", songs=songs, error="⚠️ เพลงนี้ถูกเพิ่มแล้ว ไม่สามารถเพิ่มซ้ำได้")
 
             try:
-                # ----------------------------
-                # ถ้าไม่ซ้ำ → insert
-                # ----------------------------
-                db_query("""
-                    INSERT INTO songs (title,youtube_link,description,tags,upload_date,view_count,like_count,lyrics)
-                    VALUES (?,?,?,?,?,?,?,?)
-                """, (
-                    meta.get("title"), yt_link, meta.get("description",""),
-                    ",".join(meta.get("tags",[])), meta.get("upload_date",""),
-                    meta.get("view_count",0), meta.get("like_count",0), lyrics
-                ))
-                song_id = db_query("SELECT last_insert_rowid()", fetch=True)[0][0]
+                # สร้าง connection ใหม่สำหรับ transaction
+                conn = sqlite3.connect("songs.db")
+                cur = conn.cursor()
+                
+                try:
+                    # เริ่ม transaction
+                    cur.execute("BEGIN TRANSACTION")
+                    
+                    # ----------------------------
+                    # ถ้าไม่ซ้ำ → insert
+                    # ----------------------------
+                    cur.execute("""
+                        INSERT INTO songs (title,youtube_link,description,tags,upload_date,view_count,like_count,lyrics)
+                        VALUES (?,?,?,?,?,?,?,?)
+                    """, (
+                        meta.get("title"), yt_link, meta.get("description",""),
+                        ",".join(meta.get("tags",[])), meta.get("upload_date",""),
+                        meta.get("view_count",0), meta.get("like_count",0), lyrics
+                    ))
+                    
+                    song_id = cur.lastrowid
 
-                # ตัด segment + emotion detection
-                segments = preprocess_lyrics(lyrics)
-                emotions = []
-                for i, seg in enumerate(segments):
-                    e = detect_emotion(seg)
-                    emotions.append(e)
-                    db_query("INSERT INTO segments (song_id,segment_order,text,emotion) VALUES (?,?,?,?)",
-                             (song_id, i, seg, e))
+                    # ตัด segment + emotion detection
+                    segments = preprocess_lyrics(lyrics)
+                    emotions = []
+                    for i, seg in enumerate(segments):
+                        e = detect_emotion(seg)
+                        emotions.append(e)
+                        cur.execute("""
+                            INSERT INTO segments (song_id,segment_order,text,emotion) 
+                            VALUES (?,?,?,?)""", (song_id, i, seg, e))
 
-                # สร้าง interactive graph
-                trajectory_html = plot_interactive_trajectory(emotions, meta.get("title"))
-                db_query("UPDATE songs SET graph_html=? WHERE id=?", (trajectory_html, song_id))
+                    # สร้าง interactive graph
+                    trajectory_html = plot_interactive_trajectory(emotions, meta.get("title"))
+                    cur.execute("UPDATE songs SET graph_html=? WHERE id=?", 
+                              (trajectory_html, song_id))
+                    
+                    # commit transaction
+                    conn.commit()
+                    
+                except Exception as e:
+                    # ถ้าเกิดข้อผิดพลาด rollback
+                    conn.rollback()
+                    raise e
+                finally:
+                    # ปิด connection
+                    conn.close()
             except Exception as e:
                 # ถ้าเกิดข้อผิดพลาดระหว่างการวิเคราะห์ ให้ลบข้อมูลเพลงทิ้ง
                 db_query("DELETE FROM segments WHERE song_id=?", (song_id,))
