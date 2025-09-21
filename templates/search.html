@@ -15,7 +15,7 @@
     <div class="relative">
       <input name="query" 
              value="{{ request.form['query'] or '' }}"
-             placeholder="ลองค้นหา: neutral หรือ excited → neutral → sad"
+             placeholder="ลองค้นหา: เศร้า → เฉย หรือ 'เพลงที่เริ่มโกรธแล้วเปลี่ยนเป็นตื่นเต้น'"
              class="w-full p-4 pr-32 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none">
       <button class="absolute right-2 top-2 px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:opacity-90 transition-opacity">
         ค้นหา
@@ -33,16 +33,22 @@
         <p class="font-medium mb-2">เพลงที่มีการเปลี่ยนแปลงอารมณ์:</p>
         <ul class="space-y-2 text-gray-600">
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • excited → neutral → sad
+            • เฉย → ตื่นเต้น → เฉย
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • angry → excited → neutral → sad
+            • neutral → excited → neutral
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • excited → neutral
+            • เศร้า → เฉย → ตื่นเต้น
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • lonely → neutral
+            • sad → neutral → excited
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • โกรธ → ตื่นเต้น → เฉย
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • angry → excited → neutral
           </li>
         </ul>
       </div>
@@ -52,35 +58,53 @@
         <p class="font-medium mb-2">เพลงอารมณ์เดียวกัน:</p>
         <ul class="space-y-2 text-gray-600">
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • เฉย
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
             • neutral
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • เพลงที่มีอารมณ์ neutral ตลอดทั้งเพลง
+            • เพลงที่มีอารมณ์เฉยๆ ตลอดทั้งเพลง
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • เศร้า
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
             • sad
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • เพลงที่อารมณ์ sad คงที่
+            • เพลงที่อารมณ์เศร้าตลอด
           </li>
         </ul>
       </div>
 
       <!-- ตัวอย่างแบบผสม -->
       <div>
-        <p class="font-medium mb-2">Mixed Format (ไทย/ENG):</p>
+        <p class="font-medium mb-2">รูปแบบผสม (ไทย/ENG):</p>
         <ul class="space-y-2 text-gray-600">
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • excited → neutral
+            • เหงา → เฉย
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
             • lonely → neutral
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • neutral → sad
+            • excited → neutral
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • เพลงที่เริ่มตื่นเต้นแล้วค่อยๆเปลี่ยนเป็นกลาง
+            • ตื่นเต้น → เฉย
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • เศร้า → เฉย → เหงา
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • sad → neutral → lonely
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • เพลงที่เริ่มโกรธแล้วค่อยๆเปลี่ยนเป็นตื่นเต้น
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • songs that start angry and become excited
           </li>
         </ul>
       </div>

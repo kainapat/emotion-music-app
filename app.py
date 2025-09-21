@@ -99,6 +99,7 @@ def parse_thai_emotion_query(q: str):
     1. แบบลูกศร "neutral → excited → sad"
     2. แบบคงที่ "เพลงที่อารมณ์ neutral ตลอดทั้งเพลง"
     3. แบบธรรมชาติ "เพลงที่เริ่มเศร้าแล้วค่อยๆเปลี่ยนเป็นหวัง"
+    4. แบบซับซ้อน "เพลงที่โทนใจเย็นก่อนแล้วพุ่งขึ้นมาเปล่งประกาย"
     """
     if not q:
         return []
@@ -135,56 +136,101 @@ def parse_thai_emotion_query(q: str):
         if emotion in q.lower():
             return [emotion]
     
+    # Enhanced natural language processing for complex queries
+    return _parse_complex_emotion_query(q)
+
+def _parse_complex_emotion_query(q: str):
+    """
+    ประมวลผล query ที่ซับซ้อนด้วยการวิเคราะห์ภาษาธรรมชาติแบบลึก
+    ตัวอย่าง: "ขอเพลงที่เริ่มเศร้าแล้วค่อยๆ เปลี่ยนเป็นหวัง"
+             "เพลงที่โทนใจเย็นก่อนแล้วพุ่งขึ้นมาเปล่งประกาย"
+    """
     # ลบคำทั่วไปที่ไม่จำเป็น
     q = re.sub(r"เพลงที่|ขอเพลง|แนว|โทน|อารมณ์|ช่วง|looking for|a|consistently|song|หา|มี", " ", q, flags=re.IGNORECASE)
-    q = re.sub(r"\s+", " ", q).strip()  # ลบ space หลายตัว
-    
-    # ตรวจสอบกรณีที่ query เป็นแค่ชื่ออารมณ์ภาษาอังกฤษหลังจากลบคำทั่วไป
-    if q.lower() in ["neutral", "sad", "happy", "excited", "calm", "angry", "lonely", "hope"]:
-        return [q.lower()]
+    q = re.sub(r"\s+", " ", q).strip()
     
     # ตรวจสอบกรณีที่ query เป็นแค่ชื่ออารมณ์เดียว
     single_emotion = _canonize(q.strip())
-    if single_emotion and single_emotion != "" and single_emotion != "เพลง" and single_emotion != "ที่" and single_emotion != "อารมณ์":
-        # แปลงกลับเป็นภาษาอังกฤษเพื่อให้ตรงกับฐานข้อมูล
+    if single_emotion and single_emotion != "" and single_emotion not in ["เพลง", "ที่", "อารมณ์"]:
         from emotion_model import THAI_TO_ENG
         if single_emotion in THAI_TO_ENG:
             return [THAI_TO_ENG[single_emotion]]
         return [single_emotion]
     
-    # แยกคำโดย PyThaiNLP
+    # แยกคำด้วย PyThaiNLP
     tokens = word_tokenize(q)
     
-    # สร้าง pattern สำหรับการเปลี่ยนแปลง
-    patterns = {
-        "start": ["เริ่ม", "ตอนแรก", "แรกๆ", "ช่วงแรก", "starts", "begins"],
-        "middle": ["แล้ว", "จากนั้น", "ต่อมา", "ตามด้วย", "then", "becomes", "changes to"],
-        "end": ["สุดท้าย", "ตอนจบ", "ท้ายเพลง", "จบ", "ends", "finally"]
+    # Enhanced pattern dictionary for complex emotional progressions
+    transition_patterns = {
+        "start": ["เริ่ม", "ตอนแรก", "แรกๆ", "ช่วงแรก", "ก่อน", "starts", "begins", "initially"],
+        "gradual_change": ["ค่อยๆ", "ค่อย", "ค่อยเป็นค่อยไป", "ช้าๆ", "gradually", "slowly", "gently"],
+        "sudden_change": ["พุ่ง", "กระแส", "ฉับพลัน", "ทันที", "เดี๋ยวเดียว", "suddenly", "quickly", "spikes", "bursts"],
+        "transition": ["แล้ว", "จากนั้น", "ต่อมา", "เปลี่ยน", "กลาย", "then", "becomes", "changes", "transforms"],
+        "uplifting": ["ขึ้น", "สู่", "เปล่งประกาย", "สดใส", "โปร่ง", "bright", "uplifting", "rising", "soaring"],
+        "end": ["สุดท้าย", "ตอนจบ", "ท้ายเพลง", "จบ", "ends", "finally", "eventually"]
     }
     
-    emotions = []
-    current_position = None
+    # Advanced synonym mapping for emotions
+    emotion_synonyms = {
+        "เศร้า": ["เศร้า", "เศร้าโศก", "โศกเศร้า", "หม่น", "หมอง", "หดหู่"],
+        "หวัง": ["หวัง", "ความหวัง", "มีความหวัง", "เริ่มหวัง", "หวังใจ"],
+        "สงบ": ["สงบ", "ใจเย็น", "เย็น", "โทนใจเย็น", "ผ่อนคลาย", "ชิล", "สบาย"],
+        "ตื่นเต้น": ["ตื่นเต้น", "เร้าใจ", "เปล่งประกาย", "ประกาย", "พีค", "เข้มข้น", "มัน"],
+        "สุข": ["สุข", "มีความสุข", "ร่าเริง", "สดใส", "สนุก", "ยิ้ม", "ดีใจ"],
+        "โกรธ": ["โกรธ", "โมโห", "เดือด", "แค้น", "เคือง"],
+        "เหงา": ["เหงา", "หงอย", "เศร้าเหงา", "โดดเดี่ยว"],
+        "กลาง": ["กลาง", "เฉย", "ปกติ", "ธรรมดา"]
+    }
     
+    emotions_found = []
+    transition_type = None
+    
+    # สแกนหาอารมณ์และรูปแบบการเปลี่ยนแปลง
     for i, token in enumerate(tokens):
-        # ตรวจหาคำบ่งชี้ตำแหน่ง
-        for pos, words in patterns.items():
-            if any(word in token.lower() for word in words):
-                current_position = pos
+        # ตรวจหารูปแบบการเปลี่ยนแปลง
+        for pattern_type, words in transition_patterns.items():
+            if any(word in token.lower() or token.lower() in word for word in words):
+                transition_type = pattern_type
                 break
-                
-        # หาอารมณ์จากคำ
-        emotion = _canonize(token)
-        if emotion and emotion != " ":  # ตรวจสอบว่าไม่ใช่ space
-            if current_position == "start":
-                emotions.insert(0, emotion)
-            else:
-                emotions.append(emotion)
-                
-    # ถ้าไม่มีอารมณ์ ลองหาคำที่เกี่ยวข้องกับอารมณ์ทั้งหมด
-    if not emotions:
-        emotions = [_canonize(t) for t in tokens if _canonize(t) and _canonize(t) != " "]
         
-    return [e for e in emotions if e and e != " "]  # กรองเอาแต่ค่าที่ไม่ใช่ string ว่างหรือ space
+        # ตรวจหาอารมณ์จากคำและ synonyms
+        emotion = _canonize(token)
+        if emotion and emotion != " ":
+            emotions_found.append(emotion)
+            continue
+            
+        # ตรวจหา synonyms
+        for canonical_emotion, synonyms in emotion_synonyms.items():
+            if any(syn in token.lower() or token.lower() in syn for syn in synonyms):
+                emotions_found.append(canonical_emotion)
+                break
+    
+    # สร้างลำดับอารมณ์ตามรูปแบบที่พบ
+    if len(emotions_found) >= 2:
+        # มีอารมณ์อย่างน้อย 2 อารมณ์ → ส่งคืนลำดับ
+        return emotions_found[:3]  # จำกัดไว้ 3 อารมณ์
+    elif len(emotions_found) == 1:
+        # มีอารมณ์เดียว แต่มีการบ่งบอกการเปลี่ยนแปลง
+        base_emotion = emotions_found[0]
+        
+        if transition_type in ["gradual_change", "sudden_change", "uplifting"]:
+            # ถ้ามีการบ่งบอกการเปลี่ยนแปลง ให้เดาอารมณ์ที่เป็นไปได้
+            if base_emotion == "เศร้า":
+                return ["เศร้า", "หวัง"]  # เศร้า → หวัง
+            elif base_emotion == "สงบ":
+                return ["สงบ", "ตื่นเต้น"]  # สงบ → ตื่นเต้น
+            elif base_emotion == "ตื่นเต้น":
+                return ["สงบ", "ตื่นเต้น"]  # สงบ → ตื่นเต้น
+        
+        # กรณีอื่นๆ ส่งคืนอารมณ์เดียว
+        from emotion_model import THAI_TO_ENG
+        if base_emotion in THAI_TO_ENG:
+            return [THAI_TO_ENG[base_emotion]]
+        return [base_emotion]
+    
+    # ถ้าไม่พบอารมณ์ชัดเจน ลองหาจากคำทั้งหมด
+    all_emotions = [_canonize(t) for t in tokens if _canonize(t) and _canonize(t) != " "]
+    return [e for e in all_emotions if e and e != " "][:2]  # จำกัดไว้ 2 อารมณ์
 
 def soft_subseq_match(target, seq):
     """
