@@ -2,6 +2,7 @@ import re  # ⬅ เพิ่ม
 from collections import Counter
 from flask import Flask, render_template, request, jsonify
 import sqlite3
+from pythainlp.tokenize import word_tokenize  # เพิ่ม import
 from youtube_utils import fetch_youtube_metadata, extract_video_id
 from nlp_utils import preprocess_lyrics
 from emotion_model import detect_emotion
@@ -34,29 +35,73 @@ def _canonize(label: str) -> str:
             return canon
     return label or ""
 
+def _extract_emotion_keywords(text: str) -> list:
+    """
+    แยกคำสำคัญที่เกี่ยวกับอารมณ์จากข้อความ
+    """
+    # คำที่บ่งบอกการเปลี่ยนแปลง
+    transition_words = {
+        "เริ่ม": "start",
+        "ค่อยๆ": "gradual",
+        "พุ่ง": "sudden",
+        "เปลี่ยน": "change",
+        "กลาย": "change",
+        "แล้ว": "then",
+        "จาก": "from",
+        "เป็น": "to",
+        "ก่อน": "before",
+    }
+    
+    # คำที่บ่งบอกระดับความเข้ม
+    intensity_words = {
+        "มาก": "high",
+        "เบาๆ": "low",
+        "ค่อยๆ": "gradual",
+        "พุ่ง": "spike",
+        "ขึ้น": "up",
+        "ลง": "down"
+    }
+    
+    keywords = []
+    tokens = word_tokenize(text)  # ต้อง import word_tokenize จาก pythainlp
+    
+    for i, token in enumerate(tokens):
+        # ตรวจหาคำเกี่ยวกับอารมณ์
+        emotion = _canonize(token)
+        if emotion:
+            # ดูคำรอบๆ เพื่อหาความเข้มและการเปลี่ยนแปลง
+            context = tokens[max(0, i-2):i+3]
+            intensity = next((intensity_words[w] for w in context if w in intensity_words), "normal")
+            transition = next((transition_words[w] for w in context if w in transition_words), None)
+            
+            keywords.append({
+                "emotion": emotion,
+                "intensity": intensity,
+                "transition": transition,
+                "position": i
+            })
+    
+    return keywords
+
 def parse_thai_emotion_query(q: str):
     """
-    รับ query ไทยอิสระ -> ลำดับอารมณ์ canonical เช่น ['เศร้า','หวัง'].
-    - รวมลูกศร/ตัวเชื่อม: →, ->, ถึง, ไป, แล้ว, ค่อย, จาก, สู่
-    - ตัดสัญลักษณ์/เว้นวรรค
+    รับ query ภาษาธรรมชาติ → ลำดับอารมณ์พร้อมข้อมูลเพิ่มเติม
+    ตัวอย่าง: "เพลงที่เริ่มเศร้าแล้วค่อยๆเปลี่ยนเป็นหวัง"
     """
     if not q:
         return []
-    t = q.strip()
-    # แปลงตัวเชื่อมให้เป็นลูกศรเดียวกัน
-    t = re.sub(r"(->|➡️|=>|ถึง|ไป|แล้ว|และ|ค่อย|จาก|สู่|เปลี่ยนเป็น|กลายเป็น)", "→", t)
-    # ยุบ space รอบลูกศร
-    t = re.sub(r"\s*→\s*", "→", t)
-    parts = [p for p in t.split("→") if p.strip()]
-    out = []
-    for p in parts:
-        p = re.sub(r"[^ก-๙a-zA-Z0-9]+", "", p)
-        if not p:
-            continue
-        # map เป็น canonical ด้วย contains
-        out.append(_canonize(p))
-    # ลบที่ map ไม่ได้ (stringว่าง/เดิม)
-    return [x for x in out if x]
+
+    # ลบคำทั่วไปที่ไม่จำเป็น
+    q = re.sub(r"เพลงที่|ขอเพลง|แนว|โทน|อารมณ์|ช่วง", "", q)
+    
+    # แยกคำสำคัญเกี่ยวกับอารมณ์
+    keywords = _extract_emotion_keywords(q)
+    
+    # จัดเรียงตาม position
+    keywords.sort(key=lambda x: x["position"])
+    
+    # แปลงเป็นรูปแบบเดิมเพื่อความเข้ากันได้
+    return [k["emotion"] for k in keywords]
 
 def soft_subseq_match(target, seq):
     """

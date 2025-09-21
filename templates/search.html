@@ -2,35 +2,101 @@
 {% block title %}ค้นหาเพลง - Emotion Path{% endblock %}
 {% block content %}
 
-<h2 class="text-xl font-semibold mb-4">🔍 ค้นหาเพลงตามเส้นทางอารมณ์</h2>
-
-<form method="post" class="space-y-2 mb-6">
-  <input name="query" placeholder="เช่น: เศร้า → หวัง"
-         class="border p-2 w-full rounded">
-  <button class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded">ค้นหา</button>
-</form>
-
-{% if songs %}
-  <h3 class="text-lg font-semibold mb-3">ผลลัพธ์การค้นหา</h3>
-  <div class="grid grid-cols-2 gap-4">
-    {% for s in songs %}
-      <div class="bg-white p-4 rounded shadow">
-        <h4 class="font-bold text-lg">
-          <a href="/song/{{ s[0] }}" class="hover:underline text-purple-700">{{ s[1] }}</a>
-        </h4>
-        <p class="text-sm text-gray-500">
-          👁 {{ s[2] }} 👍 {{ s[3] }} 📅 {{ s[4] }}
-        </p>
-        <div class="mt-2">
-          {{ s[5]|safe }}
-        </div>
-      </div>
-    {% endfor %}
+<div class="max-w-4xl mx-auto">
+  <!-- หัวข้อและคำอธิบาย -->
+  <div class="mb-6">
+    <h2 class="text-2xl font-semibold mb-2">🔍 ค้นหาเพลงตามเส้นทางอารมณ์</h2>
+    <p class="text-gray-600">ค้นหาเพลงด้วยภาษาธรรมชาติ หรือใช้ลูกศร (→) เพื่อระบุการเปลี่ยนแปลงของอารมณ์</p>
   </div>
-{% else %}
-  {% if request.method == "POST" %}
-    <p class="text-gray-500">❌ ไม่พบเพลงที่ตรงกับเส้นทางอารมณ์ "{{ request.form['query'] }}"</p>
+
+  <!-- ฟอร์มค้นหา -->
+  <form method="post" class="mb-8">
+    <div class="relative">
+      <input name="query" 
+             value="{{ request.form['query'] }}"
+             placeholder="ลองค้นหา: เพลงที่เริ่มเศร้าแล้วค่อยๆเปลี่ยนเป็นความหวัง"
+             class="w-full p-4 pr-32 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none">
+      <button class="absolute right-2 top-2 px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:opacity-90 transition-opacity">
+        ค้นหา
+      </button>
+    </div>
+  </form>
+
+  <!-- ตัวอย่างการค้นหา -->
+  <div class="bg-purple-50 rounded-lg p-6 mb-8">
+    <h3 class="font-semibold mb-3">💡 ตัวอย่างการค้นหา:</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <p class="font-medium mb-2">แบบภาษาธรรมชาติ:</p>
+        <ul class="space-y-2 text-gray-600">
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • เพลงที่เริ่มเศร้าแล้วค่อยๆมีความหวัง
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • ขอเพลงที่เริ่มสงบแล้วพุ่งขึ้นมาตื่นเต้น
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • เพลงที่มีความสุขตลอดทั้งเพลง
+          </li>
+        </ul>
+      </div>
+      <div>
+        <p class="font-medium mb-2">แบบใช้ลูกศร:</p>
+        <ul class="space-y-2 text-gray-600">
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • เศร้า → หวัง → มีความสุข
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • สงบ → ตื่นเต้น
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • เหงา → เศร้า → สู้
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ผลลัพธ์การค้นหา -->
+  {% if songs %}
+    <h3 class="text-xl font-semibold mb-4">✨ ผลลัพธ์การค้นหา</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {% for s in songs %}
+        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+          <h4 class="font-bold text-lg mb-2">
+            <a href="/song/{{ s[0] }}" class="hover:text-purple-600 transition-colors">
+              {{ s[1] }}
+            </a>
+          </h4>
+          <p class="text-sm text-gray-500 mb-3">
+            👁 {{ s[2] }} • 👍 {{ s[3] }} • 📅 {{ s[4] }}
+          </p>
+          <div class="border rounded-lg p-2">
+            {{ s[5]|safe }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    {% if request.method == "POST" %}
+      <div class="text-center py-8">
+        <p class="text-gray-500">❌ ไม่พบเพลงที่ตรงกับ "{{ request.form['query'] }}"</p>
+        <p class="text-sm text-gray-400 mt-2">ลองใช้คำค้นหาอื่น หรือดูตัวอย่างการค้นหาด้านบน</p>
+      </div>
+    {% endif %}
   {% endif %}
-{% endif %}
+</div>
+
+<!-- JavaScript สำหรับ copy ตัวอย่างการค้นหา -->
+<script>
+function setQuery(element) {
+  const query = element.innerText.replace('• ', '').trim();
+  const input = document.querySelector('input[name="query"]');
+  input.value = query;
+  input.focus();
+}
+</script>
+
+{% endblock %}
 
 {% endblock %}
