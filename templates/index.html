@@ -12,11 +12,49 @@
   {% endif %}
   <form method="post" class="grid grid-cols-2 gap-4">
     <input name="youtube" placeholder="ลิงก์ YouTube" class="border p-2 rounded col-span-2">
-    <textarea name="lyrics" placeholder="เนื้อเพลง" class="border p-2 rounded col-span-2"></textarea>
-    <button class="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded col-span-2">
-      วิเคราะห์อารมณ์
-    </button>
+    <textarea name="lyrics" id="lyrics" placeholder="เนื้อเพลง" class="border p-2 rounded col-span-2 font-mono"></textarea>
+    <div class="col-span-2 flex justify-end gap-2">
+      <button type="button" onclick="tokenizeLyrics()" 
+              class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+        🔄 แบ่งคำอัตโนมัติ
+      </button>
+      <button type="submit"
+              class="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-4 py-2 rounded">
+        📊 วิเคราะห์อารมณ์
+      </button>
+    </div>
   </form>
+
+  <script>
+    async function tokenizeLyrics() {
+      const textarea = document.getElementById('lyrics');
+      const lyrics = textarea.value;
+      
+      if (!lyrics.trim()) {
+        alert('กรุณาใส่เนื้อเพลงก่อน');
+        return;
+      }
+
+      try {
+        const response = await fetch('/tokenize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ lyrics: lyrics })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          textarea.value = result.tokenized_text;
+        } else {
+          alert('เกิดข้อผิดพลาดในการแบ่งคำ');
+        }
+      } catch (error) {
+        alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+      }
+    }
+  </script>
 </div>
 
 <!-- เพลงทั้งหมด -->

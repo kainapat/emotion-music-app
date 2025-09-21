@@ -1,6 +1,6 @@
 import re  # ⬅ เพิ่ม
 from collections import Counter
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import sqlite3
 from youtube_utils import fetch_youtube_metadata, extract_video_id
 from nlp_utils import preprocess_lyrics
@@ -104,31 +104,37 @@ def index():
                 songs = db_query("SELECT id,title,view_count,like_count,upload_date,graph_html FROM songs", fetch=True)
                 return render_template("index.html", songs=songs, error="⚠️ เพลงนี้ถูกเพิ่มแล้ว ไม่สามารถเพิ่มซ้ำได้")
 
-            # ----------------------------
-            # ถ้าไม่ซ้ำ → insert
-            # ----------------------------
-            db_query("""
-                INSERT INTO songs (title,youtube_link,description,tags,upload_date,view_count,like_count,lyrics)
-                VALUES (?,?,?,?,?,?,?,?)
-            """, (
-                meta.get("title"), yt_link, meta.get("description",""),
-                ",".join(meta.get("tags",[])), meta.get("upload_date",""),
-                meta.get("view_count",0), meta.get("like_count",0), lyrics
-            ))
-            song_id = db_query("SELECT last_insert_rowid()", fetch=True)[0][0]
+            try:
+                # ----------------------------
+                # ถ้าไม่ซ้ำ → insert
+                # ----------------------------
+                db_query("""
+                    INSERT INTO songs (title,youtube_link,description,tags,upload_date,view_count,like_count,lyrics)
+                    VALUES (?,?,?,?,?,?,?,?)
+                """, (
+                    meta.get("title"), yt_link, meta.get("description",""),
+                    ",".join(meta.get("tags",[])), meta.get("upload_date",""),
+                    meta.get("view_count",0), meta.get("like_count",0), lyrics
+                ))
+                song_id = db_query("SELECT last_insert_rowid()", fetch=True)[0][0]
 
-            # ตัด segment + emotion detection
-            segments = preprocess_lyrics(lyrics)
-            emotions = []
-            for i, seg in enumerate(segments):
-                e = detect_emotion(seg)
-                emotions.append(e)
-                db_query("INSERT INTO segments (song_id,segment_order,text,emotion) VALUES (?,?,?,?)",
-                         (song_id, i, seg, e))
+                # ตัด segment + emotion detection
+                segments = preprocess_lyrics(lyrics)
+                emotions = []
+                for i, seg in enumerate(segments):
+                    e = detect_emotion(seg)
+                    emotions.append(e)
+                    db_query("INSERT INTO segments (song_id,segment_order,text,emotion) VALUES (?,?,?,?)",
+                             (song_id, i, seg, e))
 
-            # สร้าง interactive graph
-            trajectory_html = plot_interactive_trajectory(emotions, meta.get("title"))
-            db_query("UPDATE songs SET graph_html=? WHERE id=?", (trajectory_html, song_id))
+                # สร้าง interactive graph
+                trajectory_html = plot_interactive_trajectory(emotions, meta.get("title"))
+                db_query("UPDATE songs SET graph_html=? WHERE id=?", (trajectory_html, song_id))
+            except Exception as e:
+                # ถ้าเกิดข้อผิดพลาดระหว่างการวิเคราะห์ ให้ลบข้อมูลเพลงทิ้ง
+                db_query("DELETE FROM segments WHERE song_id=?", (song_id,))
+                db_query("DELETE FROM songs WHERE id=?", (song_id,))
+                return render_template("index.html", songs=songs, error=f"⚠️ เกิดข้อผิดพลาดในการวิเคราะห์: {str(e)}")
 
     songs = db_query("SELECT id,title,view_count,like_count,upload_date,graph_html FROM songs", fetch=True)
     return render_template("index.html", songs=songs, error=error)
@@ -367,6 +373,28 @@ def dashboard():
     }
 
     return render_template("dashboard.html", stats=stats)
+
+# ----------------------
+# Tokenize API
+# ----------------------
+@app.route("/tokenize", methods=["POST"])
+def tokenize_text():
+    try:
+        data = request.get_json()
+        lyrics = data.get("lyrics", "")
+        
+        from nlp_utils import auto_tokenize
+        tokenized = auto_tokenize(lyrics)
+        
+        return jsonify({
+            "success": True,
+            "tokenized_text": tokenized
+        })
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 400
 
 # ----------------------
 if __name__ == "__main__":

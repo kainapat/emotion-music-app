@@ -11,6 +11,7 @@ python-dotenv==1.0.0
 transformers==4.35.2
 pythainlp==4.1.0
 sentence-transformers==2.2.2
+nltk==3.8.1
 
 # Data Processing & Visualization
 pandas==2.1.3

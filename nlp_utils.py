@@ -1,4 +1,10 @@
 import re
+from pythainlp.tokenize import word_tokenize as thai_tokenize
+import nltk
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
 
 _SECTION_PATTERNS = [
     r'^\s*(intro|อินโทร)\s*:?\s*$', 
@@ -7,6 +13,43 @@ _SECTION_PATTERNS = [
     r'^\s*(bridge|บริดจ์)\s*:?\s*$',
     r'^\s*(outro|เอาท์โทร)\s*:?\s*$',
 ]
+
+def auto_tokenize(text: str) -> str:
+    """
+    Automatically tokenize mixed Thai-English text
+    Returns formatted text with proper word boundaries
+    """
+    if not text:
+        return ""
+    
+    # แยกบรรทัด
+    lines = text.split('\n')
+    tokenized_lines = []
+    
+    for line in lines:
+        if not line.strip():
+            tokenized_lines.append('')
+            continue
+            
+        # แยกส่วนไทย-อังกฤษ
+        parts = re.split(r'([A-Za-z]+(?:\s+[A-Za-z]+)*)', line)
+        tokenized_parts = []
+        
+        for part in parts:
+            if not part.strip():
+                continue
+            # ถ้าเป็นภาษาอังกฤษ
+            if re.match(r'^[A-Za-z\s]+$', part):
+                tokens = nltk.word_tokenize(part)
+                tokenized_parts.append(' '.join(tokens))
+            # ถ้าเป็นภาษาไทย
+            else:
+                tokens = thai_tokenize(part)
+                tokenized_parts.append(' '.join(tokens))
+                
+        tokenized_lines.append(' '.join(tokenized_parts))
+    
+    return '\n'.join(tokenized_lines)
 
 def _clean_text(s: str) -> str:
     s = re.sub(r'https?://\S+', ' ', s)     # remove URL
