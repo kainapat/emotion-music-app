@@ -26,9 +26,10 @@
   <!-- ตัวอย่างการค้นหา -->
   <div class="bg-purple-50 rounded-lg p-6 mb-8">
     <h3 class="font-semibold mb-3">💡 ตัวอย่างการค้นหา:</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- ตัวอย่างภาษาไทยแบบธรรมชาติ -->
       <div>
-        <p class="font-medium mb-2">แบบภาษาธรรมชาติ:</p>
+        <p class="font-medium mb-2">แบบภาษาธรรมชาติ (ไทย):</p>
         <ul class="space-y-2 text-gray-600">
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
             • เพลงที่เริ่มเศร้าแล้วค่อยๆมีความหวัง
@@ -41,17 +42,38 @@
           </li>
         </ul>
       </div>
+
+      <!-- ตัวอย่างภาษาอังกฤษแบบธรรมชาติ -->
       <div>
-        <p class="font-medium mb-2">แบบใช้ลูกศร:</p>
+        <p class="font-medium mb-2">Natural Language (ENG):</p>
+        <ul class="space-y-2 text-gray-600">
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • Song that starts sad then becomes hopeful
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • Song that goes from calm to excited
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • Happy song all the way through
+          </li>
+        </ul>
+      </div>
+
+      <!-- ตัวอย่างแบบใช้ลูกศร -->
+      <div>
+        <p class="font-medium mb-2">Arrow Format (ไทย/ENG):</p>
         <ul class="space-y-2 text-gray-600">
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
             • เศร้า → หวัง → มีความสุข
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • สงบ → ตื่นเต้น
+            • sad → hope → happy
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • เหงา → เศร้า → สู้
+            • calm → excited
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • lonely → sad → hope
           </li>
         </ul>
       </div>
