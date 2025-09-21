@@ -28,49 +28,59 @@
     <h3 class="font-semibold mb-3">💡 ตัวอย่างการค้นหา:</h3>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <!-- ตัวอย่างภาษาไทยแบบธรรมชาติ -->
+      <!-- เพลงที่มีการเปลี่ยนแปลงอารมณ์มาก -->
       <div>
-        <p class="font-medium mb-2">แบบภาษาธรรมชาติ (ไทย):</p>
+        <p class="font-medium mb-2">เพลงที่มี Transition เด่น:</p>
         <ul class="space-y-2 text-gray-600">
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • เพลงที่เริ่มปกติแล้วเปลี่ยนเป็นเศร้า
+            • neutral → excited → sad → excited
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • เพลงที่มีอารมณ์เป็นกลางตลอดทั้งเพลง
+            • เพลงที่เริ่มจากเศร้า ค่อยๆ มีความหวัง แล้วกลับมาเศร้าอีกครั้ง
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • ขอเพลงที่เริ่มเศร้าแล้วค่อยๆ สดใส
+            • angry → excited → neutral → excited → neutral → sad
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • Song with multiple emotional changes from sad to neutral to excited
           </li>
         </ul>
       </div>
 
-      <!-- ตัวอย่างภาษาอังกฤษแบบธรรมชาติ -->
+      <!-- เพลงที่อารมณ์คงที่ -->
       <div>
-        <p class="font-medium mb-2">Natural Language (ENG):</p>
+        <p class="font-medium mb-2">เพลงที่อารมณ์คงที่:</p>
         <ul class="space-y-2 text-gray-600">
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • Song that starts neutral then becomes excited
+            • เพลงที่มีอารมณ์เศร้าตลอดทั้งเพลง
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • Looking for a song that goes from sad to neutral
+            • Looking for a consistently neutral song
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • Song with changing emotions from neutral to excited
+            • เพลงที่อารมณ์ excited ไม่เปลี่ยนแปลง
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • Song with stable lonely emotion throughout
           </li>
         </ul>
       </div>
 
-      <!-- ตัวอย่างแบบใช้ลูกศร -->
+      <!-- ตัวอย่างแบบผสม -->
       <div>
-        <p class="font-medium mb-2">Arrow Format (ไทย/ENG):</p>
+        <p class="font-medium mb-2">Mixed Format (ไทย/ENG):</p>
         <ul class="space-y-2 text-gray-600">
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • neutral → excited → sad
+            • lonely → neutral → lonely → neutral → lonely
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • เศร้า → เป็นกลาง → เหงา
+            • เพลงที่สลับไปมาระหว่างความรู้สึกตื่นเต้นกับเป็นกลาง
           </li>
           <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
-            • excited → neutral → excited
+            • excited → neutral → excited → neutral with high intensity
+          </li>
+          <li class="hover:text-purple-600 cursor-pointer" onclick="setQuery(this)">
+            • neutral ตลอดทั้งเพลง calm and steady
           </li>
         </ul>
       </div>
