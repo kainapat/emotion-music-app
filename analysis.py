@@ -9,6 +9,10 @@ def plot_interactive_trajectory(emotions, song_name):
     fig = px.line(
         df, x="step", y="emotion",
         title=f"Emotion Trajectory: {song_name}",
-        markers=True
+        markers=True,
+        labels={
+            "step": "Step",  # X-axis label in English
+            "emotion": "Emotion"  # Y-axis label in English
+        }
     )
-    return fig.to_html(full_html=False)  # คืน HTML string
+    return fig.to_html(full_html=False)  # Return HTML string

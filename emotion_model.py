@@ -67,17 +67,20 @@ def _lexicon_fallback(text: str) -> str:
 def detect_emotion(text: str, threshold: float = 0.55, multi_label: bool = False) -> str:
     """วิเคราะห์อารมณ์จากข้อความ ถ้าไม่มั่นใจจะใช้ lexicon fallback"""
     if not text.strip():
-        return "เฉย"
+        return "neutral" 
     try:
         res = _zs(text, candidate_labels=CANDIDATE_LABELS, multi_label=multi_label)
         if multi_label:
             picked = [lbl for lbl, sc in zip(res["labels"], res["scores"]) if sc >= threshold]
             if picked:
-                return ENG_TO_THAI.get(picked[0], "เฉย")
+                return picked[0]  # Return English label directly
         else:
             lbl, sc = res["labels"][0], res["scores"][0]
             if sc >= threshold:
-                return ENG_TO_THAI.get(lbl, "เฉย")
-        return _lexicon_fallback(text)
+                return lbl  # Return English label directly
+        # Get Thai emotion and convert back to English
+        thai_emotion = _lexicon_fallback(text)
+        return THAI_TO_ENG.get(thai_emotion, "neutral")
     except Exception:
-        return _lexicon_fallback(text)
+        thai_emotion = _lexicon_fallback(text)
+        return THAI_TO_ENG.get(thai_emotion, "neutral")
