@@ -31,14 +31,17 @@ def _canonize(label: str) -> str:
     if not label:
         return ""
     t = re.sub(r"\s+", "", label.strip())
+    
+    # ตรวจสอบกรณีที่ label เป็นภาษาอังกฤษตรงๆ
+    from emotion_model import ENG_TO_THAI
+    if t.lower() in ENG_TO_THAI:
+        return ENG_TO_THAI[t.lower()]
+    
     # หาแบบ contains เพื่อครอบคลุมคำขยาย เช่น 'มีความสุขมาก'
     for alias, canon in ALIAS2CANON.items():
         if alias in t:
             return canon
-    # ถ้าไม่เจอใน lexicon ไทย ลองหาใน lexicon อังกฤษ
-    from emotion_model import ENG_TO_THAI
-    if t.lower() in ENG_TO_THAI:
-        return ENG_TO_THAI[t.lower()]
+    
     return t if t else ""
 
 def _extract_emotion_keywords(text: str) -> list:
@@ -127,12 +130,26 @@ def parse_thai_emotion_query(q: str):
     if q.strip().lower() in ["neutral", "sad", "happy", "excited", "calm", "angry", "lonely", "hope"]:
         return [q.strip().lower()]
     
+    # ตรวจสอบกรณีที่ query มีชื่ออารมณ์ภาษาอังกฤษอยู่ (ก่อนลบคำทั่วไป)
+    for emotion in ["neutral", "sad", "happy", "excited", "calm", "angry", "lonely", "hope"]:
+        if emotion in q.lower():
+            return [emotion]
+    
     # ลบคำทั่วไปที่ไม่จำเป็น
-    q = re.sub(r"เพลงที่|ขอเพลง|แนว|โทน|อารมณ์|ช่วง|looking for|a|consistently|song", "", q, flags=re.IGNORECASE)
+    q = re.sub(r"เพลงที่|ขอเพลง|แนว|โทน|อารมณ์|ช่วง|looking for|a|consistently|song|หา|มี", " ", q, flags=re.IGNORECASE)
+    q = re.sub(r"\s+", " ", q).strip()  # ลบ space หลายตัว
+    
+    # ตรวจสอบกรณีที่ query เป็นแค่ชื่ออารมณ์ภาษาอังกฤษหลังจากลบคำทั่วไป
+    if q.lower() in ["neutral", "sad", "happy", "excited", "calm", "angry", "lonely", "hope"]:
+        return [q.lower()]
     
     # ตรวจสอบกรณีที่ query เป็นแค่ชื่ออารมณ์เดียว
     single_emotion = _canonize(q.strip())
     if single_emotion and single_emotion != "" and single_emotion != "เพลง" and single_emotion != "ที่" and single_emotion != "อารมณ์":
+        # แปลงกลับเป็นภาษาอังกฤษเพื่อให้ตรงกับฐานข้อมูล
+        from emotion_model import THAI_TO_ENG
+        if single_emotion in THAI_TO_ENG:
+            return [THAI_TO_ENG[single_emotion]]
         return [single_emotion]
     
     # แยกคำโดย PyThaiNLP
