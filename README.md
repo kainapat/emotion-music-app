@@ -1,15 +1,54 @@
 # 🎵 Emotion Music App
 
-A web application that analyzes emotional trajectories in Thai songs using Natural Language Processing and Machine Learning.
+A web application that analyzes emotional trajectories - **Input**: 
+  - YouTube URL
+  - Lyrics (supports Thai, English, or mixed)
+  - Auto-tokenization for mixed language text
+- **Processing**: 
+  - Extract metadata from YouTube API
+  - Smart lyrics segmentation:
+    - Structure-based: Detects song sections (intro, verse, chorus, etc.)
+    - Length-based: Splits long sections (~200 chars)
+    - Paragraph-based fallback
+  - Emotion analysis:
+    - Zero-shot classification with BART model
+    - Lexicon-based fallback system
+    - Automatic Thai-English conversion
+  - Visualization:
+    - Interactive emotion trajectory charts
+    - English labels for international accessibility
+    - Dynamic step-by-step progression
+- **Output**: 
+  - SQLite database storage
+  - Interactive Plotly visualization
+  - Bilingual emotion mapping songs using Natural Language Processing and Machine Learning.
 
 ## 🌟 Features
 
-- **Emotion Analysis**: Analyzes emotional content in song lyrics using Thai NLP
-- **Interactive Visualization**: Creates interactive emotion trajectory charts using Plotly
-- **YouTube Integration**: Fetches song metadata from YouTube API
-- **Smart Search**: Search songs by emotional patterns (e.g., "เศร้า → หวัง")
-- **Thai Language Support**: Full support for Thai language processing
-- **Vector Search**: Semantic search using FAISS and sentence transformers
+- **Bilingual Emotion Analysis**: 
+  - Analyzes emotions in Thai and English lyrics
+  - Smart mixed language processing
+  - Comprehensive emotion mapping system
+- **International Visualization**: 
+  - Interactive emotion trajectory charts
+  - English labels for global accessibility
+  - Dynamic step-based progression
+- **Advanced Search System**:
+  - Bilingual pattern matching (Thai/English)
+  - Natural language queries in both languages
+  - Semantic search using FAISS
+- **Intelligent Lyrics Processing**:
+  - Automatic song structure detection
+  - Smart section segmentation
+  - Mixed language tokenization
+- **YouTube Integration**: 
+  - Automatic metadata fetching
+  - View count and like tracking
+  - Thumbnail generation
+- **Robust Data Management**:
+  - SQLite database storage
+  - Efficient emotion caching
+  - Version tracking
 
 ## 🚀 Quick Start
 
@@ -79,18 +118,27 @@ emotion-music-app/
 ## 🎯 How It Works
 
 ### 1. Song Analysis Pipeline
-- **Input**: YouTube URL + Lyrics
+- **Input**: YouTube URL + Lyrics (Thai/English)
 - **Processing**: 
   - Extract metadata from YouTube API
-  - Segment lyrics into meaningful parts
+  - Segment lyrics into meaningful parts (intro, verse, chorus, etc.)
   - Analyze emotion for each segment using BART model
-  - Create interactive emotion trajectory visualization
-- **Output**: Stored in SQLite database with visualization
+  - Create interactive emotion trajectory visualization with English labels
+- **Output**: Stored in SQLite database with bilingual visualization
 
 ### 2. Emotion Detection
 - Uses `facebook/bart-large-mnli` for zero-shot classification
-- Supports 8 emotion categories: sad, lonely, hope, happy, excited, calm, angry, neutral
-- Thai lexicon fallback for better accuracy
+- Supports 8 emotion categories in both Thai and English:
+  - sad (เศร้า)
+  - lonely (เหงา)
+  - hope (หวัง)
+  - happy (สุข)
+  - excited (ตื่นเต้น)
+  - calm (สงบ)
+  - angry (โกรธ)
+  - neutral (เฉย)
+- Bidirectional Thai-English emotion mapping
+- Thai lexicon fallback with English conversion
 - Threshold-based classification (default: 0.55)
 
 ### 3. Search System
@@ -115,18 +163,35 @@ emotion-music-app/
 
 ### Emotion Trajectory Visualization
 - Interactive Plotly charts showing emotional progression
+- English labels for better international understanding
+- Axis labels: "Step" and "Emotion"
 - Hover effects with detailed information
 - Responsive design for all devices
 
-### Thai Language Support
+### Bilingual Support
 - Uses PyThaiNLP for Thai text tokenization
-- Custom emotion aliases mapping (e.g., "เศร้า", "เสียใจ" → "sad")
-- Handles Thai text preprocessing and cleaning
+- NLTK for English text processing
+- Automatic language detection and processing
+- Mixed language support in lyrics
+- Smart section detection for song structure:
+  - Thai: อินโทร, ท่อน, คอรัส, บริดจ์, เอาท์โทร
+  - English: intro, verse, chorus, bridge, outro
+- Comprehensive emotion mapping system:
+  - Primary emotions in English
+  - Thai-English bidirectional conversion
+  - Multiple aliases per emotion
 
 ### Smart Search
-- **Pattern Search**: "เศร้า → หวัง" finds songs that transition from sadness to hope
-- **Flexible Matching**: Supports various connectors (→, ->, ถึง, ไป, แล้ว)
-- **Canonical Mapping**: Normalizes different emotion expressions
+- **Pattern Search**: Supports both Thai and English queries:
+  - Thai: "เศร้า → หวัง" 
+  - English: "sad → hope"
+- **Flexible Matching**: 
+  - Arrow format: →, ->
+  - Natural language: "song that starts sad and becomes happy"
+  - Thai phrases: "เพลงที่เริ่มเศร้าแล้วค่อยๆเปลี่ยนเป็นสุข"
+- **Canonical Mapping**: 
+  - Normalizes different emotion expressions in both languages
+  - Automatic Thai-English emotion conversion
 
 ## 🛠️ Configuration
 
