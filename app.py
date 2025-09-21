@@ -213,9 +213,9 @@ def soft_subseq_match(target, seq):
     # กรณีอารมณ์คงที่: ถ้า target มีอารมณ์เดียวซ้ำกัน
     if len(set(target)) == 1:
         target_emotion = target[0]
-        # ต้องพบอารมณ์นั้นอย่างน้อย 80% ของความยาว sequence
+        # ต้องพบอารมณ์นั้นอย่างน้อย 1 ครั้ง (สำหรับการค้นหาอารมณ์เดียว)
         emotion_count = sum(1 for s in seq if s == target_emotion)
-        return emotion_count >= 0.8 * len(seq)
+        return emotion_count >= 1
     
     # กรณีปกติ: ค้นหาลำดับอารมณ์
     i = 0
