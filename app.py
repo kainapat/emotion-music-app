@@ -28,12 +28,18 @@ for canon, aliases in TH_EMO_ALIASES.items():
 
 def _canonize(label: str) -> str:
     """แปะ label ให้เป็น canonical (ไทย) จากผลโมเดล/ข้อความ"""
-    t = re.sub(r"\s+", "", label or "")
+    if not label:
+        return ""
+    t = re.sub(r"\s+", "", label.strip())
     # หาแบบ contains เพื่อครอบคลุมคำขยาย เช่น 'มีความสุขมาก'
     for alias, canon in ALIAS2CANON.items():
         if alias in t:
             return canon
-    return label or ""
+    # ถ้าไม่เจอใน lexicon ไทย ลองหาใน lexicon อังกฤษ
+    from emotion_model import ENG_TO_THAI
+    if t.lower() in ENG_TO_THAI:
+        return ENG_TO_THAI[t.lower()]
+    return t if t else ""
 
 def _extract_emotion_keywords(text: str) -> list:
     """
@@ -100,10 +106,7 @@ def parse_thai_emotion_query(q: str):
         parts = [p.strip() for p in q.split("→") if p.strip()]
         return [_canonize(p) for p in parts]
 
-    # ลบคำทั่วไปที่ไม่จำเป็น
-    q = re.sub(r"เพลงที่|ขอเพลง|แนว|โทน|อารมณ์|ช่วง", "", q)
-    
-    # ตรวจสอบรูปแบบอารมณ์คงที่
+    # ตรวจสอบรูปแบบอารมณ์คงที่ก่อน
     constant_patterns = [
         r"(คงที่|ไม่เปลี่ยนแปลง|ตลอดทั้งเพลง|throughout|consistent|stable)",
         r"(เหมือนเดิม|ทั้งเพลง|all the way|same emotion)"
@@ -115,9 +118,22 @@ def parse_thai_emotion_query(q: str):
             tokens = word_tokenize(q)
             for token in tokens:
                 emotion = _canonize(token)
-                if emotion:
+                # ตรวจสอบว่าเป็นอารมณ์จริงๆ ไม่ใช่คำทั่วไป
+                if emotion and emotion != " " and emotion != "" and emotion not in ["เพลง", "ที่", "อารมณ์", "หา", "มี", "ตลอด", "ทั้ง", "ไม่", "เปลี่ยนแปลง", "คงที่"]:
                     # ส่งคืนอารมณ์เดียวกัน 3 ครั้งเพื่อแสดงความต่อเนื่อง
                     return [emotion] * 3
+    
+    # ตรวจสอบกรณีที่ query เป็นแค่ชื่ออารมณ์ภาษาอังกฤษ
+    if q.strip().lower() in ["neutral", "sad", "happy", "excited", "calm", "angry", "lonely", "hope"]:
+        return [q.strip().lower()]
+    
+    # ลบคำทั่วไปที่ไม่จำเป็น
+    q = re.sub(r"เพลงที่|ขอเพลง|แนว|โทน|อารมณ์|ช่วง|looking for|a|consistently|song", "", q, flags=re.IGNORECASE)
+    
+    # ตรวจสอบกรณีที่ query เป็นแค่ชื่ออารมณ์เดียว
+    single_emotion = _canonize(q.strip())
+    if single_emotion and single_emotion != "" and single_emotion != "เพลง" and single_emotion != "ที่" and single_emotion != "อารมณ์":
+        return [single_emotion]
     
     # แยกคำโดย PyThaiNLP
     tokens = word_tokenize(q)
@@ -141,7 +157,7 @@ def parse_thai_emotion_query(q: str):
                 
         # หาอารมณ์จากคำ
         emotion = _canonize(token)
-        if emotion:
+        if emotion and emotion != " ":  # ตรวจสอบว่าไม่ใช่ space
             if current_position == "start":
                 emotions.insert(0, emotion)
             else:
@@ -149,9 +165,9 @@ def parse_thai_emotion_query(q: str):
                 
     # ถ้าไม่มีอารมณ์ ลองหาคำที่เกี่ยวข้องกับอารมณ์ทั้งหมด
     if not emotions:
-        emotions = [_canonize(t) for t in tokens if _canonize(t)]
+        emotions = [_canonize(t) for t in tokens if _canonize(t) and _canonize(t) != " "]
         
-    return [e for e in emotions if e]  # กรองเอาแต่ค่าที่ไม่ใช่ string ว่าง
+    return [e for e in emotions if e and e != " "]  # กรองเอาแต่ค่าที่ไม่ใช่ string ว่างหรือ space
 
 def soft_subseq_match(target, seq):
     """
@@ -163,16 +179,17 @@ def soft_subseq_match(target, seq):
     if not target:
         return False
         
-    # ทำให้เป็นภาษาเดียวกัน (ไทย)
+    # ทำให้เป็นภาษาเดียวกัน (อังกฤษ) เพื่อให้ตรงกับฐานข้อมูล
     from emotion_model import THAI_TO_ENG, ENG_TO_THAI
     
     def normalize_emotion(e):
-        # ถ้าเป็นภาษาอังกฤษ แปลงเป็นไทย
-        if e.lower() in ENG_TO_THAI:
-            return ENG_TO_THAI[e.lower()]
-        return e
+        # ถ้าเป็นภาษาไทย แปลงเป็นอังกฤษ
+        if e in THAI_TO_ENG:
+            return THAI_TO_ENG[e]
+        # ถ้าเป็นภาษาอังกฤษอยู่แล้ว ให้เป็น lowercase
+        return e.lower() if e else e
     
-    # แปลงทั้งสองฝั่งให้เป็นภาษาไทย
+    # แปลงทั้งสองฝั่งให้เป็นภาษาอังกฤษ (ตรงกับฐานข้อมูล)
     target = [normalize_emotion(t) for t in target]
     seq = [normalize_emotion(s) for s in seq]
     
