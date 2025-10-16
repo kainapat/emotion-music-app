@@ -232,6 +232,73 @@ def _parse_complex_emotion_query(q: str):
     all_emotions = [_canonize(t) for t in tokens if _canonize(t) and _canonize(t) != " "]
     return [e for e in all_emotions if e and e != " "][:2]  # จำกัดไว้ 2 อารมณ์
 
+def calculate_match_score(query_emotions, song_emotions):
+    """
+    คำนวณคะแนนความตรงกันระหว่าง query กับลำดับอารมณ์ของเพลง
+    Returns: float (0.0 - 1.0)
+    """
+    if not query_emotions or not song_emotions:
+        return 0.0
+    
+    # ทำให้เป็นภาษาเดียวกัน (อังกฤษ) เพื่อให้ตรงกับฐานข้อมูล
+    from emotion_model import THAI_TO_ENG, ENG_TO_THAI
+    
+    def normalize_emotion(e):
+        # ถ้าเป็นภาษาไทย แปลงเป็นอังกฤษ
+        if e in THAI_TO_ENG:
+            return THAI_TO_ENG[e]
+        # ถ้าเป็นภาษาอังกฤษอยู่แล้ว ให้เป็น lowercase
+        return e.lower() if e else e
+    
+    # แปลงทั้งสองฝั่งให้เป็นภาษาอังกฤษ (ตรงกับฐานข้อมูล)
+    query_emotions = [normalize_emotion(e) for e in query_emotions]
+    song_emotions = [normalize_emotion(e) for e in song_emotions]
+    
+    # กรณีอารมณ์คงที่: ถ้า query มีอารมณ์เดียว
+    if len(set(query_emotions)) == 1:
+        target_emotion = query_emotions[0]
+        emotion_count = sum(1 for s in song_emotions if s == target_emotion)
+        if emotion_count == 0:
+            return 0.0
+        # คำนวณสัดส่วนของอารมณ์ที่ตรงกัน
+        return min(emotion_count / len(song_emotions), 1.0)
+    
+    # กรณีปกติ: ค้นหาลำดับอารมณ์
+    # ใช้ Longest Common Subsequence (LCS) algorithm
+    n, m = len(query_emotions), len(song_emotions)
+    dp = [[0] * (m + 1) for _ in range(n + 1)]
+    
+    # คำนวณ LCS
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            if query_emotions[i-1] == song_emotions[j-1]:
+                dp[i][j] = dp[i-1][j-1] + 1
+            else:
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+    
+    lcs_length = dp[n][m]
+    
+    # คำนวณคะแนนตามความยาวของ LCS และตำแหน่ง
+    if lcs_length == 0:
+        return 0.0
+    
+    # Base score: สัดส่วนของ LCS ต่อความยาวของ query
+    base_score = lcs_length / len(query_emotions)
+    
+    # Position bonus: ให้คะแนนเพิ่มถ้าลำดับตรงกันในตำแหน่งที่ถูกต้อง
+    position_bonus = 0.0
+    query_idx = 0
+    for song_emotion in song_emotions:
+        if query_idx < len(query_emotions) and song_emotion == query_emotions[query_idx]:
+            query_idx += 1
+            position_bonus += 0.1  # bonus สำหรับแต่ละตำแหน่งที่ตรงกัน
+    
+    # Normalize position bonus
+    position_bonus = min(position_bonus, 0.3)  # จำกัด bonus สูงสุด 30%
+    
+    final_score = min(base_score + position_bonus, 1.0)
+    return final_score
+
 def soft_subseq_match(target, seq):
     """
     soft subsequence matching with support for:
@@ -516,6 +583,8 @@ def search():
 
         # ดึงเพลงทั้งหมด + segments
         all_songs = db_query("SELECT id,title,view_count,like_count,upload_date,graph_html FROM songs", fetch=True)
+        scored_songs = []  # [(score, song_data)]
+        
         for s in all_songs:
             segs = db_query("SELECT emotion FROM segments WHERE song_id=? ORDER BY segment_order", (s[0],), fetch=True)
             # ทำ canonical เช่นเดียวกับ query
@@ -523,7 +592,12 @@ def search():
 
             # ตรงตามลำดับแบบ soft-subsequence ก็ถือว่า match
             if soft_subseq_match(q_tokens, song_seq):
-                songs.append(s)
+                score = calculate_match_score(q_tokens, song_seq)
+                scored_songs.append((score, s))
+        
+        # เรียงตามคะแนนมาก→น้อย, view_count มาก→น้อย
+        scored_songs.sort(key=lambda x: (-x[0], -x[1][2]))
+        songs = [s for _, s in scored_songs]
 
     return render_template("search.html", songs=songs, q_tokens=" → ".join(q_tokens))
 
