@@ -6,6 +6,8 @@ A sophisticated web application that analyzes the emotional journey of songs usi
 - **Bilingual Processing**: Full support for Thai, English, and mixed-language lyrics
 - **Smart Analysis**: Advanced emotion detection using BART model with lexicon fallback
 - **Interactive Visualization**: Dynamic Plotly charts showing emotional progression
+- **Color-coded Lyrics**: Lyrics segments displayed with emotion-specific colors and icons
+- **Overall Emotion Summary**: Comprehensive emotion analysis with detailed explanations
 - **Intelligent Search**: Natural language queries and emotion pattern matching
 - **YouTube Integration**: Automatic metadata extraction and view/like tracking
 - **Real-time Processing**: Instant emotion analysis and visualization generation
@@ -16,6 +18,8 @@ A sophisticated web application that analyzes the emotional journey of songs usi
 - **Song Analysis Pipeline**: Add YouTube URL + lyrics → Automatic emotion analysis → Interactive visualization
 - **Emotion Detection**: 8 emotion categories (sad, lonely, hope, happy, excited, calm, angry, neutral)
 - **Smart Segmentation**: Automatic detection of song sections (intro, verse, chorus, bridge, outro)
+- **Color-coded Display**: Each emotion has unique colors and icons for easy identification
+- **Overall Emotion Analysis**: Comprehensive emotion summary with percentage breakdown and explanations
 - **Real-time Visualization**: Interactive Plotly charts with hover effects and responsive design
 
 ### 🔍 Advanced Search Capabilities
@@ -163,6 +167,23 @@ emotion-music-app/
 - Axis labels: "Step" and "Emotion"
 - Hover effects with detailed information
 - Responsive design for all devices
+
+### Color-coded Emotion System
+- **SAD**: Blue background with blue icon 💙
+- **LONELY**: Purple background with purple icon 💜
+- **HOPE**: Green background with green icon 💚
+- **HAPPY**: Yellow background with yellow icon 💛
+- **EXCITED**: Red background with red icon ❤️
+- **CALM**: Indigo background with blue icon 🔵
+- **ANGRY**: Orange background with orange icon 🧡
+- **NEUTRAL**: Gray background with white icon ⚪
+
+### Overall Emotion Analysis
+- Calculates dominant emotion from all song segments
+- Provides percentage breakdown of emotion distribution
+- Explains why the song has that overall emotion
+- Shows secondary emotions when present
+- Detailed explanations only visible in song detail view
 
 ### Bilingual Processing Engine
 - **Advanced Tokenization**:
