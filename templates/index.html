@@ -59,23 +59,37 @@
 
 <!-- เพลงทั้งหมด -->
 <h2 class="text-xl font-semibold mb-4">🎵 เพลงทั้งหมด</h2>
-<div class="grid grid-cols-3 gap-6">
-  {% for s in songs %}
-  <div class="bg-white p-3 rounded shadow">
-    <p class="font-bold">
-      <a href="/song/{{ s[0] }}" class="text-blue-600 hover:underline">
-        {{ s[1] }}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {% for song in songs %}
+  <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow">
+    <!-- สรุปอารมณ์แบบย่อ -->
+    <div class="mb-3 p-2 rounded-lg border {{ song.emotion_color }}">
+      <div class="flex items-center space-x-2">
+        <span class="text-lg">{{ song.emotion_icon }}</span>
+        <span class="text-sm font-semibold uppercase">{{ song.overall_emotion }}</span>
+      </div>
+    </div>
+    
+    <!-- ข้อมูลเพลง -->
+    <p class="font-bold text-lg mb-2">
+      <a href="/song/{{ song.id }}" class="text-blue-600 hover:underline">
+        {{ song.title }}
       </a>
     </p>
-    <p class="text-sm text-gray-500">👁 {{ s[2] }} 👍 {{ s[3] }} 📅 {{ s[4] }}</p>
-    <div class="mt-2">
-      {{ s[5]|safe }}
+    <p class="text-sm text-gray-500 mb-3">👁 {{ song.views }} 👍 {{ song.likes }} 📅 {{ song.upload }}</p>
+    
+    <!-- กราฟ -->
+    {% if song.graph %}
+    <div class="mb-3">
+      {{ song.graph|safe }}
     </div>
+    {% endif %}
+    
     <!-- ปุ่มลบ -->
-    <form action="/song/{{ s[0] }}/delete" method="post"
-          onsubmit="return confirm('❌ ต้องการลบเพลง {{ s[1] }} จริงหรือไม่?');">
+    <form action="/song/{{ song.id }}/delete" method="post"
+          onsubmit="return confirm('❌ ต้องการลบเพลง {{ song.title }} จริงหรือไม่?');">
       <button type="submit"
-              class="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+              class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">
         🗑️ ลบ
       </button>
     </form>

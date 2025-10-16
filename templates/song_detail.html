@@ -6,11 +6,27 @@
   <title>{{ song.title }} - Emotion Path</title>
 </head>
 <body class="bg-gray-100 p-6">
-  <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow">
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow">
     <h1 class="text-2xl font-bold mb-2">🎵 {{ song.title }}</h1>
     <p class="text-sm text-gray-500">
       👁 {{ song.views }} | 👍 {{ song.likes }} | 📅 {{ song.upload }}
     </p>
+
+    <!-- สรุปอารมณ์โดยรวม -->
+    <div class="mt-4 p-4 rounded-lg border-2 {{ overall_emotion_color }}">
+      <div class="flex items-center space-x-3">
+        <span class="text-2xl">{{ overall_emotion_icon }}</span>
+        <div>
+          <h3 class="text-lg font-semibold">อารมณ์โดยรวมของเพลง</h3>
+          <p class="text-sm opacity-75 mb-2">
+            เพลงนี้มีอารมณ์โดยรวมเป็น <strong>{{ overall_emotion.upper() }}</strong>
+          </p>
+          <p class="text-xs opacity-90 leading-relaxed">
+            {{ emotion_explanation }}
+          </p>
+        </div>
+      </div>
+    </div>
 
     <!-- ลิงก์ YouTube -->
     <div class="mt-4">
@@ -50,14 +66,17 @@
     <!-- Segment -->
     <div class="mt-6">
       <h2 class="text-lg font-semibold mb-2">📝 เนื้อเพลง & อารมณ์</h2>
-      <ul class="list-disc pl-6 space-y-1">
-        {% for order, text, emo in segments %}
-          <li>
-            <span class="font-semibold text-pink-600">[{{ emo }}]</span>
-            {{ text }}
-          </li>
+      <div class="space-y-3">
+        {% for segment in segments %}
+          <div class="p-4 rounded-lg border {{ segment.color_class }}">
+            <div class="flex items-center space-x-2 mb-2">
+              <span class="text-lg">{{ segment.icon }}</span>
+              <span class="font-semibold text-sm uppercase">{{ segment.emotion }}</span>
+            </div>
+            <p class="text-sm leading-relaxed">{{ segment.text }}</p>
+          </div>
         {% endfor %}
-      </ul>
+      </div>
     </div>
 
     <!-- ปุ่มกลับ -->

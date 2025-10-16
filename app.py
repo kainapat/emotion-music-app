@@ -270,6 +270,119 @@ def soft_subseq_match(target, seq):
             i += 1
     return i == len(target)
 
+def calculate_overall_emotion(emotions):
+    """
+    คำนวณอารมณ์โดยรวมของเพลงจากรายการอารมณ์
+    """
+    if not emotions:
+        return "unknown"
+    
+    # นับความถี่ของแต่ละอารมณ์
+    emotion_counts = {}
+    for emotion in emotions:
+        emotion = emotion.lower() if emotion else "unknown"
+        emotion_counts[emotion] = emotion_counts.get(emotion, 0) + 1
+    
+    # หาอารมณ์ที่มีความถี่สูงสุด
+    most_common_emotion = max(emotion_counts.items(), key=lambda x: x[1])
+    
+    # ถ้าอารมณ์ที่พบบ่อยที่สุดมีสัดส่วนมากกว่า 50% ให้ใช้อารมณ์นั้น
+    total_emotions = len(emotions)
+    if most_common_emotion[1] / total_emotions > 0.5:
+        return most_common_emotion[0]
+    
+    # ถ้าไม่มีความชัดเจน ให้วิเคราะห์จากลำดับอารมณ์
+    # หาอารมณ์ที่ปรากฏในส่วนท้ายของเพลง (มีน้ำหนักมากกว่า)
+    if len(emotions) >= 3:
+        # ใช้ 30% สุดท้ายของเพลง
+        end_portion = emotions[-max(1, len(emotions)//3):]
+        end_emotion_counts = {}
+        for emotion in end_portion:
+            emotion = emotion.lower() if emotion else "unknown"
+            end_emotion_counts[emotion] = end_emotion_counts.get(emotion, 0) + 1
+        
+        if end_emotion_counts:
+            return max(end_emotion_counts.items(), key=lambda x: x[1])[0]
+    
+    return most_common_emotion[0]
+
+def get_emotion_color(emotion):
+    """
+    กำหนดสีสำหรับแต่ละอารมณ์
+    """
+    emotion_colors = {
+        'sad': 'bg-blue-100 text-blue-800 border-blue-200',
+        'lonely': 'bg-purple-100 text-purple-800 border-purple-200',
+        'hope': 'bg-green-100 text-green-800 border-green-200',
+        'happy': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        'excited': 'bg-red-100 text-red-800 border-red-200',
+        'calm': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+        'angry': 'bg-orange-100 text-orange-800 border-orange-200',
+        'neutral': 'bg-gray-100 text-gray-600 border-gray-300',
+        'unknown': 'bg-gray-100 text-gray-500 border-gray-300'
+    }
+    return emotion_colors.get(emotion.lower(), 'bg-gray-100 text-gray-500 border-gray-300')
+
+def get_emotion_icon(emotion):
+    """
+    กำหนดไอคอนสำหรับแต่ละอารมณ์ (ไม่ใช้อีโมจิ)
+    """
+    emotion_icons = {
+        'sad': '💙',
+        'lonely': '💜',
+        'hope': '💚',
+        'happy': '💛',
+        'excited': '❤️',
+        'calm': '🔵',
+        'angry': '🧡',
+        'neutral': '⚪',
+        'unknown': '❓'
+    }
+    return emotion_icons.get(emotion.lower(), '❓')
+
+def get_emotion_explanation(emotion, emotions_list):
+    """
+    อธิบายว่าทำไมเพลงถึงมีอารมณ์โดยรวมแบบนั้น
+    """
+    if not emotions_list:
+        return "ไม่สามารถวิเคราะห์อารมณ์ได้"
+    
+    emotion_counts = {}
+    for e in emotions_list:
+        e = e.lower() if e else "unknown"
+        emotion_counts[e] = emotion_counts.get(e, 0) + 1
+    
+    total_segments = len(emotions_list)
+    main_emotion = emotion.lower()
+    
+    # คำนวณเปอร์เซ็นต์ของอารมณ์หลัก
+    main_percentage = (emotion_counts.get(main_emotion, 0) / total_segments) * 100
+    
+    # หาอารมณ์รอง
+    sorted_emotions = sorted(emotion_counts.items(), key=lambda x: x[1], reverse=True)
+    secondary_emotions = [e for e, count in sorted_emotions[1:3] if count > 0]
+    
+    # สร้างคำอธิบาย
+    explanations = {
+        'sad': f"เพลงนี้มีอารมณ์เศร้าเป็นหลัก ({main_percentage:.1f}% ของเพลง) เนื่องจากเนื้อเพลงส่วนใหญ่แสดงถึงความเศร้า ความเสียใจ หรือความหดหู่",
+        'lonely': f"เพลงนี้มีอารมณ์เหงาเป็นหลัก ({main_percentage:.1f}% ของเพลง) เนื่องจากเนื้อเพลงส่วนใหญ่แสดงถึงความโดดเดี่ยว ความว้าเหว่ หรือความรู้สึกเหงา",
+        'hope': f"เพลงนี้มีอารมณ์หวังเป็นหลัก ({main_percentage:.1f}% ของเพลง) เนื่องจากเนื้อเพลงส่วนใหญ่แสดงถึงความหวัง การให้กำลังใจ หรือการมองโลกในแง่ดี",
+        'happy': f"เพลงนี้มีอารมณ์สุขเป็นหลัก ({main_percentage:.1f}% ของเพลง) เนื่องจากเนื้อเพลงส่วนใหญ่แสดงถึงความสุข ความร่าเริง หรือความสนุกสนาน",
+        'excited': f"เพลงนี้มีอารมณ์ตื่นเต้นเป็นหลัก ({main_percentage:.1f}% ของเพลง) เนื่องจากเนื้อเพลงส่วนใหญ่แสดงถึงความตื่นเต้น ความเร้าใจ หรือความเข้มข้น",
+        'calm': f"เพลงนี้มีอารมณ์สงบเป็นหลัก ({main_percentage:.1f}% ของเพลง) เนื่องจากเนื้อเพลงส่วนใหญ่แสดงถึงความสงบ ความเยือกเย็น หรือความผ่อนคลาย",
+        'angry': f"เพลงนี้มีอารมณ์โกรธเป็นหลัก ({main_percentage:.1f}% ของเพลง) เนื่องจากเนื้อเพลงส่วนใหญ่แสดงถึงความโกรธ ความโมโห หรือความไม่พอใจ",
+        'neutral': f"เพลงนี้มีอารมณ์เฉยเป็นหลัก ({main_percentage:.1f}% ของเพลง) เนื่องจากเนื้อเพลงส่วนใหญ่แสดงถึงอารมณ์ที่เป็นกลาง ไม่เด่นชัดไปทางใดทางหนึ่ง"
+    }
+    
+    base_explanation = explanations.get(main_emotion, f"เพลงนี้มีอารมณ์{main_emotion}เป็นหลัก ({main_percentage:.1f}% ของเพลง)")
+    
+    # เพิ่มข้อมูลอารมณ์รองถ้ามี
+    if secondary_emotions:
+        secondary_text = " และ ".join(secondary_emotions[:2])
+        base_explanation += f" นอกจากนี้ยังมีอารมณ์{secondary_text}ผสมอยู่ด้วย"
+    
+    return base_explanation
+
 app = Flask(__name__)
 
 def db_query(query, args=(), fetch=False):
@@ -365,8 +478,30 @@ def index():
                 db_query("DELETE FROM songs WHERE id=?", (song_id,))
                 return render_template("index.html", songs=songs, error=f"⚠️ เกิดข้อผิดพลาดในการวิเคราะห์: {str(e)}")
 
-    songs = db_query("SELECT id,title,view_count,like_count,upload_date,graph_html FROM songs", fetch=True)
-    return render_template("index.html", songs=songs, error=error)
+    songs_data = db_query("SELECT id,title,view_count,like_count,upload_date,graph_html FROM songs", fetch=True)
+    
+    # เพิ่มข้อมูลอารมณ์โดยรวมให้กับแต่ละเพลง
+    enhanced_songs = []
+    for song in songs_data:
+        song_id = song[0]
+        # ดึงอารมณ์ของเพลงนี้
+        emotions = db_query("SELECT emotion FROM segments WHERE song_id=? ORDER BY segment_order", (song_id,), fetch=True)
+        emotion_list = [emotion[0] for emotion in emotions if emotion[0]]
+        overall_emotion = calculate_overall_emotion(emotion_list)
+        
+        enhanced_songs.append({
+            "id": song[0],
+            "title": song[1],
+            "views": song[2],
+            "likes": song[3],
+            "upload": song[4],
+            "graph": song[5],
+            "overall_emotion": overall_emotion,
+            "emotion_color": get_emotion_color(overall_emotion),
+            "emotion_icon": get_emotion_icon(overall_emotion)
+        })
+    
+    return render_template("index.html", songs=enhanced_songs, error=error)
 
 # ----------------------
 # Search (ค้นหาเพลง)
@@ -409,6 +544,23 @@ def song_detail(song_id):
                            FROM segments WHERE song_id=? ORDER BY segment_order""",
                         (song_id,), fetch=True)
 
+    # คำนวณอารมณ์โดยรวม
+    emotions = [seg[2] for seg in segments if seg[2]]  # ดึงอารมณ์จาก segments
+    overall_emotion = calculate_overall_emotion(emotions)
+    emotion_explanation = get_emotion_explanation(overall_emotion, emotions)
+    
+    # เพิ่มข้อมูลสีและไอคอนให้กับ segments
+    enhanced_segments = []
+    for seg in segments:
+        emotion = seg[2] if seg[2] else "unknown"
+        enhanced_segments.append({
+            "order": seg[0],
+            "text": seg[1],
+            "emotion": emotion,
+            "color_class": get_emotion_color(emotion),
+            "icon": get_emotion_icon(emotion)
+        })
+
     # ❌ ไม่ auto-refresh แล้ว → ใช้ค่าที่ DB มีเท่านั้น
     graph_html = song[6]
 
@@ -423,7 +575,11 @@ def song_detail(song_id):
             "likes": song[5],
             "graph": graph_html
         },
-        segments=segments
+        segments=enhanced_segments,
+        overall_emotion=overall_emotion,
+        overall_emotion_color=get_emotion_color(overall_emotion),
+        overall_emotion_icon=get_emotion_icon(overall_emotion),
+        emotion_explanation=emotion_explanation
     )
 
 # ----------------------
