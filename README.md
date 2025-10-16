@@ -19,7 +19,7 @@ A sophisticated web application that analyzes the emotional journey of songs usi
 - **Emotion Detection**: 8 emotion categories (sad, lonely, hope, happy, excited, calm, angry, neutral)
 - **Smart Segmentation**: Automatic detection of song sections (intro, verse, chorus, bridge, outro)
 - **Color-coded Display**: Each emotion has unique colors and icons for easy identification
-- **Overall Emotion Analysis**: Comprehensive emotion summary with percentage breakdown and explanations
+- **Overall Emotion Analysis**: Comprehensive emotion summary with natural language explanations
 - **Real-time Visualization**: Interactive Plotly charts with hover effects and responsive design
 
 ### 🔍 Advanced Search Capabilities
@@ -180,8 +180,7 @@ emotion-music-app/
 
 ### Overall Emotion Analysis
 - Calculates dominant emotion from all song segments
-- Provides percentage breakdown of emotion distribution
-- Explains why the song has that overall emotion
+- Explains why the song has that overall emotion with natural language descriptions
 - Shows secondary emotions when present
 - Detailed explanations only visible in song detail view
 
