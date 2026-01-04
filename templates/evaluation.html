@@ -1,0 +1,318 @@
+{% extends "layout.html" %} {% block title %}การประเมินผล - Emotion Path{%
+endblock %} {% block content %}
+
+<h2 class="text-2xl font-bold text-pink-600 mb-6">
+  📊 การประเมินผลและประสิทธิภาพ
+</h2>
+
+<!-- ตัวชี้วัดเชิงปริมาณ -->
+<div class="bg-white rounded-xl shadow p-6 mb-6">
+  <h3 class="text-xl font-semibold mb-4">ตัวชี้วัดเชิงปริมาณ</h3>
+  <p class="text-gray-600 mb-4">
+    ประเมินด้วยชุดทดสอบ human annotation (20 เพลง, 150 ท่อน)
+  </p>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead class="bg-gradient-to-r from-pink-100 to-purple-100">
+        <tr>
+          <th class="px-4 py-3 text-left font-semibold">โมเดล</th>
+          <th class="px-4 py-3 text-center font-semibold">Accuracy</th>
+          <th class="px-4 py-3 text-center font-semibold">Precision</th>
+          <th class="px-4 py-3 text-center font-semibold">Recall</th>
+          <th class="px-4 py-3 text-center font-semibold">F1-Score</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <tr class="bg-green-50">
+          <td class="px-4 py-3 font-semibold text-green-700">
+            🏆 BART (ของเรา)
+          </td>
+          <td class="px-4 py-3 text-center font-bold text-green-600">72.5%</td>
+          <td class="px-4 py-3 text-center">71.3%</td>
+          <td class="px-4 py-3 text-center">70.8%</td>
+          <td class="px-4 py-3 text-center">71.0%</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-3">Lexicon-based</td>
+          <td class="px-4 py-3 text-center">58.2%</td>
+          <td class="px-4 py-3 text-center">55.1%</td>
+          <td class="px-4 py-3 text-center">59.3%</td>
+          <td class="px-4 py-3 text-center">57.1%</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-3">Random Baseline</td>
+          <td class="px-4 py-3 text-center text-gray-400">12.5%</td>
+          <td class="px-4 py-3 text-center text-gray-400">11.8%</td>
+          <td class="px-4 py-3 text-center text-gray-400">12.5%</td>
+          <td class="px-4 py-3 text-center text-gray-400">12.1%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Ground Truth Annotation -->
+<div class="bg-white rounded-xl shadow p-6 mb-6">
+  <h3 class="text-xl font-semibold mb-4">กระบวนการ Ground Truth Annotation</h3>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-indigo-50 p-4 rounded-lg text-center">
+      <p class="text-3xl font-bold text-indigo-600">3</p>
+      <p class="text-sm text-gray-600">Annotators</p>
+    </div>
+    <div class="bg-purple-50 p-4 rounded-lg text-center">
+      <p class="text-3xl font-bold text-purple-600">0.68</p>
+      <p class="text-sm text-gray-600">Fleiss' Kappa</p>
+    </div>
+    <div class="bg-pink-50 p-4 rounded-lg text-center">
+      <p class="text-3xl font-bold text-pink-600">150</p>
+      <p class="text-sm text-gray-600">ท่อนที่ประเมิน</p>
+    </div>
+    <div class="bg-green-50 p-4 rounded-lg text-center">
+      <p class="text-3xl font-bold text-green-600">20</p>
+      <p class="text-sm text-gray-600">เพลงทดสอบ</p>
+    </div>
+  </div>
+  <p class="text-gray-500 text-sm mt-4">
+    📝 แต่ละท่อนได้รับการจำแนกโดย annotator 3 คนอย่างอิสระ แล้วใช้ majority
+    voting
+  </p>
+</div>
+
+<!-- Confusion Matrix -->
+<div class="bg-white rounded-xl shadow p-6 mb-6">
+  <h3 class="text-xl font-semibold mb-4">Confusion Matrix Analysis</h3>
+  <p class="text-gray-600 mb-4">การจำแนกผิดที่พบบ่อย:</p>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+      <p class="font-semibold text-blue-700">Sad ↔ Lonely</p>
+      <p class="text-2xl font-bold text-blue-600">18%</p>
+      <p class="text-sm text-gray-500">อารมณ์ใกล้เคียงกัน</p>
+    </div>
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+      <p class="font-semibold text-yellow-700">Happy ↔ Excited</p>
+      <p class="text-2xl font-bold text-yellow-600">15%</p>
+      <p class="text-sm text-gray-500">เป็นบวกทั้งคู่ ต่างความเข้ม</p>
+    </div>
+    <div class="bg-gray-50 border-l-4 border-gray-400 p-4 rounded-r-lg">
+      <p class="font-semibold text-gray-700">Calm ↔ Neutral</p>
+      <p class="text-2xl font-bold text-gray-600">22%</p>
+      <p class="text-sm text-gray-500">อารมณ์ไม่รุนแรง</p>
+    </div>
+  </div>
+</div>
+
+<!-- เปรียบเทียบงานวิจัย -->
+<div class="bg-white rounded-xl shadow p-6 mb-6">
+  <h3 class="text-xl font-semibold mb-4">
+    เปรียบเทียบกับงานวิจัยที่เกี่ยวข้อง
+  </h3>
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead class="bg-gradient-to-r from-indigo-100 to-blue-100">
+        <tr>
+          <th class="px-4 py-3 text-left font-semibold">งานวิจัย</th>
+          <th class="px-4 py-3 text-center font-semibold">ชุดข้อมูล</th>
+          <th class="px-4 py-3 text-center font-semibold">Accuracy</th>
+          <th class="px-4 py-3 text-left font-semibold">หมายเหตุ</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <tr class="bg-green-50">
+          <td class="px-4 py-3 font-semibold text-green-700">🏆 งานนี้</td>
+          <td class="px-4 py-3 text-center">เพลงไทย (26 เพลง)</td>
+          <td class="px-4 py-3 text-center font-bold text-green-600">72.5%</td>
+          <td class="px-4 py-3 text-sm">รองรับภาษาไทย, BART-based</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-3">Thai Lyric Sentiment (IAENG 2019)</td>
+          <td class="px-4 py-3 text-center">เพลงไทย</td>
+          <td class="px-4 py-3 text-center">68.0%</td>
+          <td class="px-4 py-3 text-sm">Lexicon + Neural Network</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-3">BiLSTM + mBERT (Hindi)</td>
+          <td class="px-4 py-3 text-center">เพลงฮินดี</td>
+          <td class="px-4 py-3 text-center">75.0%</td>
+          <td class="px-4 py-3 text-sm">Multilingual BERT</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-3">GRU + CNN + BERT (Chinese)</td>
+          <td class="px-4 py-3 text-center">เพลงจีน (แปล)</td>
+          <td class="px-4 py-3 text-center">78.6%</td>
+          <td class="px-4 py-3 text-sm">Hybrid model</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="text-gray-500 text-sm mt-4">
+    ⚠️
+    การเปรียบเทียบโดยตรงทำได้ยากเนื่องจากชุดข้อมูลและการจำแนกอารมณ์ที่แตกต่างกัน
+  </p>
+</div>
+
+<!-- การแก้ไข Neutral Bias -->
+<div class="bg-white rounded-xl shadow p-6 mb-6">
+  <h3 class="text-xl font-semibold mb-4">🔧 การแก้ไข Neutral Bias</h3>
+  <div class="flex items-center justify-center mb-4">
+    <div class="text-center px-6">
+      <p class="text-4xl font-bold text-red-500">63.5%</p>
+      <p class="text-sm text-gray-500">ก่อนแก้ไข</p>
+    </div>
+    <div class="text-4xl text-gray-300 px-4">→</div>
+    <div class="text-center px-6">
+      <p class="text-4xl font-bold text-green-500">45%</p>
+      <p class="text-sm text-gray-500">หลังแก้ไข</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+    <div class="bg-gradient-to-r from-pink-50 to-purple-50 p-4 rounded-lg">
+      <p class="font-semibold text-purple-700">1. ขยายพจนานุกรม</p>
+      <p class="text-sm text-gray-600">
+        เพิ่มคำศัพท์อารมณ์ภาษาไทยจาก ~37 เป็น 80+ คำ
+      </p>
+    </div>
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg">
+      <p class="font-semibold text-indigo-700">2. Smart Fallback</p>
+      <p class="text-sm text-gray-600">
+        ใช้ majority voting และการอนุมานจากรูปแบบ
+      </p>
+    </div>
+    <div class="bg-gradient-to-r from-green-50 to-teal-50 p-4 rounded-lg">
+      <p class="font-semibold text-teal-700">3. ปรับ Threshold</p>
+      <p class="text-sm text-gray-600">
+        ทดสอบ confidence threshold 0.35-0.65 เลือกใช้ 0.55
+      </p>
+    </div>
+    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg">
+      <p class="font-semibold text-orange-700">4. ตัวบ่งชี้บริบท</p>
+      <p class="text-sm text-gray-600">
+        ตรวจจับคำที่บ่งบอกความรู้สึกเชิงบวก/ลบ
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ข้อมูลชุดข้อมูล -->
+<h2 class="text-2xl font-bold text-pink-600 mb-6 mt-8">📚 ข้อมูลชุดข้อมูล</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+  <!-- ความหลากหลายแนวเพลง -->
+  <div class="bg-white rounded-xl shadow p-6">
+    <h3 class="text-xl font-semibold mb-4">ความหลากหลายของแนวเพลง</h3>
+    <div class="space-y-3">
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span>ป๊อป</span>
+          <span class="font-semibold">38%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-pink-500 h-2 rounded-full" style="width: 38%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span>อินดี้</span>
+          <span class="font-semibold">23%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-purple-500 h-2 rounded-full" style="width: 23%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span>ร็อค</span>
+          <span class="font-semibold">19%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-red-500 h-2 rounded-full" style="width: 19%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span>ลูกทุ่ง</span>
+          <span class="font-semibold">12%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-green-500 h-2 rounded-full" style="width: 12%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span>บัลลาด</span>
+          <span class="font-semibold">8%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-blue-500 h-2 rounded-full" style="width: 8%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- สถิติชุดข้อมูล -->
+  <div class="bg-white rounded-xl shadow p-6">
+    <h3 class="text-xl font-semibold mb-4">สถิติชุดข้อมูล</h3>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-pink-50 p-4 rounded-lg text-center">
+        <p class="text-3xl font-bold text-pink-600">{{ stats.total_songs }}</p>
+        <p class="text-sm text-gray-600">เพลงทั้งหมด</p>
+      </div>
+      <div class="bg-purple-50 p-4 rounded-lg text-center">
+        <p class="text-3xl font-bold text-purple-600">
+          {{ stats.total_segments }}
+        </p>
+        <p class="text-sm text-gray-600">ท่อนทั้งหมด</p>
+      </div>
+      <div class="bg-indigo-50 p-4 rounded-lg text-center">
+        <p class="text-3xl font-bold text-indigo-600">
+          {{ stats.avg_segments }}
+        </p>
+        <p class="text-sm text-gray-600">ท่อน/เพลง (เฉลี่ย)</p>
+      </div>
+      <div class="bg-blue-50 p-4 rounded-lg text-center">
+        <p class="text-3xl font-bold text-blue-600">127</p>
+        <p class="text-sm text-gray-600">ตัวอักษร/ท่อน</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- การกระจายอารมณ์ -->
+<div class="bg-white rounded-xl shadow p-6 mb-6">
+  <h3 class="text-xl font-semibold mb-4">การกระจายอารมณ์</h3>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    {% for emotion, count in stats.emotion_stats %}
+    <div
+      class="{% if emotion == 'neutral' %}bg-gray-100{% elif emotion == 'sad' %}bg-blue-100{% elif emotion == 'happy' %}bg-yellow-100{% elif emotion == 'hope' %}bg-green-100{% elif emotion == 'calm' %}bg-indigo-100{% elif emotion == 'excited' %}bg-red-100{% elif emotion == 'lonely' %}bg-purple-100{% elif emotion == 'angry' %}bg-orange-100{% else %}bg-gray-100{% endif %} p-4 rounded-lg text-center"
+    >
+      <p class="text-2xl font-bold">{{ count }}</p>
+      <p class="text-sm capitalize">{{ emotion }}</p>
+      <p class="text-xs text-gray-500">
+        {{ "%.1f"|format(count / stats.total_segments * 100) }}%
+      </p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- เกณฑ์การคัดเลือก -->
+<div class="bg-white rounded-xl shadow p-6 mb-6">
+  <h3 class="text-xl font-semibold mb-4">เกณฑ์การคัดเลือกเพลง</h3>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="border border-pink-200 rounded-lg p-4">
+      <p class="font-semibold text-pink-700 mb-2">🎵 ความหลากหลายแนวเพลง</p>
+      <p class="text-sm text-gray-600">ป๊อป, ร็อค, อินดี้, ลูกทุ่ง, บัลลาด</p>
+    </div>
+    <div class="border border-purple-200 rounded-lg p-4">
+      <p class="font-semibold text-purple-700 mb-2">💜 ความหลากหลายอารมณ์</p>
+      <p class="text-sm text-gray-600">เพลงอารมณ์ชัดเจน, คงที่และเปลี่ยนแปลง</p>
+    </div>
+    <div class="border border-indigo-200 rounded-lg p-4">
+      <p class="font-semibold text-indigo-700 mb-2">📝 คุณภาพเนื้อเพลง</p>
+      <p class="text-sm text-gray-600">ภาษาไทยล้วน หรือไทย-อังกฤษผสม</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

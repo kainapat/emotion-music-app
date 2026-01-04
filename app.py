@@ -834,6 +834,35 @@ def dashboard():
     return render_template("dashboard.html", stats=stats)
 
 # ----------------------
+# Evaluation (การประเมินผล)
+# ----------------------
+@app.route("/evaluation")
+def evaluation():
+    # ดึงข้อมูลสถิติจากฐานข้อมูลจริง
+    total_songs = db_query("SELECT COUNT(*) FROM songs", fetch=True)[0][0]
+    total_segments = db_query("SELECT COUNT(*) FROM segments", fetch=True)[0][0]
+    
+    # คำนวณค่าเฉลี่ยท่อนต่อเพลง
+    avg_segments = round(total_segments / max(total_songs, 1), 2)
+    
+    # นับจำนวนอารมณ์ทั้งหมด
+    emotion_stats = db_query("""
+        SELECT emotion, COUNT(*) as cnt
+        FROM segments
+        GROUP BY emotion
+        ORDER BY cnt DESC
+    """, fetch=True)
+    
+    stats = {
+        "total_songs": total_songs,
+        "total_segments": total_segments,
+        "avg_segments": avg_segments,
+        "emotion_stats": emotion_stats
+    }
+    
+    return render_template("evaluation.html", stats=stats)
+
+# ----------------------
 # Tokenize API
 # ----------------------
 @app.route("/tokenize", methods=["POST"])
