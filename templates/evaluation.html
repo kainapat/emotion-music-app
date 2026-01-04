@@ -42,28 +42,30 @@ endblock %} {% block content %}
         </tr>
         <tr>
           <td class="px-4 py-3">Random Baseline</td>
-          <td class="px-4 py-3 text-center text-gray-400">20.0%</td>
-          <td class="px-4 py-3 text-center text-gray-400">11.0%</td>
-          <td class="px-4 py-3 text-center text-gray-400">20.0%</td>
-          <td class="px-4 py-3 text-center text-gray-400">14.2%</td>
+          <td class="px-4 py-3 text-center text-gray-400">10.0%</td>
+          <td class="px-4 py-3 text-center text-gray-400">10.0%</td>
+          <td class="px-4 py-3 text-center text-gray-400">10.0%</td>
+          <td class="px-4 py-3 text-center text-gray-400">10.0%</td>
         </tr>
       </tbody>
     </table>
   </div>
 </div>
 
-
-
 <!-- Confusion Matrix -->
 <div class="bg-white rounded-xl shadow p-6 mb-6">
   <h3 class="text-xl font-semibold mb-4">Confusion Matrix Analysis</h3>
-  <p class="text-gray-600 mb-6">ตารางแสดงความสับสนระหว่างสิ่งที่ทำนาย (Predicted) กับความเป็นจริง (Actual):</p>
-  
+  <p class="text-gray-600 mb-6">
+    ตารางแสดงความสับสนระหว่างสิ่งที่ทำนาย (Predicted) กับความเป็นจริง (Actual):
+  </p>
+
   <div class="overflow-x-auto mb-8">
     <table class="min-w-full text-center text-sm">
       <thead>
         <tr>
-          <th class="p-2 border-b-2 border-gray-200 bg-gray-50 text-left">Actual \ Predicted</th>
+          <th class="p-2 border-b-2 border-gray-200 bg-gray-50 text-left">
+            Actual \ Predicted
+          </th>
           <th class="p-2 border-b-2 border-gray-200 bg-gray-50">Sad</th>
           <th class="p-2 border-b-2 border-gray-200 bg-gray-50">Lonely</th>
           <th class="p-2 border-b-2 border-gray-200 bg-gray-50">Hope</th>
@@ -97,7 +99,8 @@ endblock %} {% block content %}
           <td class="p-2">0</td>
           <td class="p-2">0</td>
           <td class="p-2">0</td>
-          <td class="p-2 bg-yellow-100 text-yellow-800">1</td> <!-- Lonely->Neutral -->
+          <td class="p-2 bg-yellow-100 text-yellow-800">1</td>
+          <!-- Lonely->Neutral -->
         </tr>
         <!-- Hope Row (Acc 1/2 = 50%) -->
         <tr>
@@ -109,7 +112,8 @@ endblock %} {% block content %}
           <td class="p-2">0</td>
           <td class="p-2">0</td>
           <td class="p-2">0</td>
-          <td class="p-2 bg-yellow-100 text-yellow-800">1</td> <!-- Hope->Neutral -->
+          <td class="p-2 bg-yellow-100 text-yellow-800">1</td>
+          <!-- Hope->Neutral -->
         </tr>
         <!-- Happy Row (Acc 2/3 = 66%) -->
         <tr>
@@ -121,7 +125,8 @@ endblock %} {% block content %}
           <td class="p-2">0</td>
           <td class="p-2">0</td>
           <td class="p-2">0</td>
-          <td class="p-2 bg-yellow-100 text-yellow-800">1</td> <!-- Happy->Neutral -->
+          <td class="p-2 bg-yellow-100 text-yellow-800">1</td>
+          <!-- Happy->Neutral -->
         </tr>
         <!-- Excited Row (Acc 2/2 = 100%) -->
         <tr>
@@ -141,11 +146,13 @@ endblock %} {% block content %}
           <td class="p-2">0</td>
           <td class="p-2">0</td>
           <td class="p-2">0</td>
-          <td class="p-2 bg-yellow-100 text-yellow-800">1</td> <!-- Calm->Happy -->
+          <td class="p-2 bg-yellow-100 text-yellow-800">1</td>
+          <!-- Calm->Happy -->
           <td class="p-2">0</td>
           <td class="p-2 bg-green-200 font-bold">1</td>
           <td class="p-2">0</td>
-          <td class="p-2 bg-yellow-100 text-yellow-800">1</td> <!-- Calm->Neutral -->
+          <td class="p-2 bg-yellow-100 text-yellow-800">1</td>
+          <!-- Calm->Neutral -->
         </tr>
         <!-- Angry Row (Acc 2/3 = 66%) -->
         <tr>
@@ -157,12 +164,14 @@ endblock %} {% block content %}
           <td class="p-2">0</td>
           <td class="p-2">0</td>
           <td class="p-2 bg-green-200 font-bold">2</td>
-          <td class="p-2 bg-yellow-100 text-yellow-800">1</td> <!-- Angry->Neutral -->
+          <td class="p-2 bg-yellow-100 text-yellow-800">1</td>
+          <!-- Angry->Neutral -->
         </tr>
         <!-- Neutral Row (Acc 1/2 = 50%) -->
         <tr>
           <th class="p-2 border-r bg-gray-50 font-semibold">Neutral</th>
-          <td class="p-2 bg-yellow-100 text-yellow-800">1</td> <!-- Neutral->Sad -->
+          <td class="p-2 bg-yellow-100 text-yellow-800">1</td>
+          <!-- Neutral->Sad -->
           <td class="p-2">0</td>
           <td class="p-2">0</td>
           <td class="p-2">0</td>
@@ -174,28 +183,32 @@ endblock %} {% block content %}
       </tbody>
     </table>
   </div>
-  
+
   <p class="text-gray-600 mb-4 font-semibold">สรุปประเด็นสำคัญจากการทดสอบ:</p>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
       <p class="font-semibold text-green-700">Sad & Excited</p>
       <p class="text-xl font-bold text-green-600">High Precision</p>
-      <p class="text-sm text-gray-500">แม่นยำ 100% ในอารมณ์ที่มีเอกลักษณ์ชัดเจน</p>
+      <p class="text-sm text-gray-500">
+        แม่นยำ 100% ในอารมณ์ที่มีเอกลักษณ์ชัดเจน
+      </p>
     </div>
     <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
       <p class="font-semibold text-green-700">Hope & Lonely</p>
       <p class="text-xl font-bold text-green-600">Resolved</p>
-      <p class="text-sm text-gray-500">แก้ปัญหาการทายผิดเป็น Neutral ได้สำเร็จ (ขยาย Lexicon)</p>
+      <p class="text-sm text-gray-500">
+        แก้ปัญหาการทายผิดเป็น Neutral ได้สำเร็จ (ขยาย Lexicon)
+      </p>
     </div>
     <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
       <p class="font-semibold text-yellow-700">Calm Ambiguity</p>
       <p class="text-xl font-bold text-yellow-600">Minor Issue</p>
-      <p class="text-sm text-gray-500">ยังมีความก้ำกึ่งเล็กน้อยกับ Happy (ยอมรับได้)</p>
+      <p class="text-sm text-gray-500">
+        ยังมีความก้ำกึ่งเล็กน้อยกับ Happy (ยอมรับได้)
+      </p>
     </div>
   </div>
 </div>
-
-
 
 <!-- การแก้ไข Neutral Bias -->
 <div class="bg-white rounded-xl shadow p-6 mb-6">
@@ -211,7 +224,9 @@ endblock %} {% block content %}
       <p class="text-sm text-gray-500">หลังปรับปรุง (Est.)</p>
     </div>
   </div>
-  <p class="text-center text-gray-600 mb-6 font-semibold">📉 ลดลง 30% ในกลุ่มตัวอย่างทดสอบ</p>
+  <p class="text-center text-gray-600 mb-6 font-semibold">
+    📉 ลดลง 30% ในกลุ่มตัวอย่างทดสอบ
+  </p>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
     <div class="bg-gradient-to-r from-pink-50 to-purple-50 p-4 rounded-lg">

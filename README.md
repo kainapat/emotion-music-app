@@ -168,7 +168,7 @@ The system was evaluated using a standard test set (20 segments):
 | --------------- | -------- | --------- | ------ | -------- |
 | **BART (Ours)** | 75.0%    | 83.8%     | 75.0%  | 75.7%    |
 | Lexicon-based   | 65.0%    | 92.2%     | 65.0%  | 68.1%    |
-| Random Baseline | 15.0%    | 27.5%     | 15.0%  | 18.5%    |
+| Random Baseline | 10.0%    | 10.0%     | 10.0%  | 10.0%    |
 
 ### Confusion Matrix Analysis
 
