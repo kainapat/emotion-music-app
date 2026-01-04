@@ -162,7 +162,9 @@ emotion-music-app/
 
 ### Quantitative Metrics
 
-The system was evaluated using a test set with human annotations (20 songs, 150 segments):
+The system was evaluated using a test set with human annotations:
+
+> **Note**: The metrics below are from a subset of the dataset (20 songs, 150 segments) that were annotated by experts. The full dataset contains 26 songs. You can view real-time statistics on the "Evaluation" page in the web app or run `python get_stats.py`
 
 | Model           | Accuracy | Precision | Recall | F1-Score |
 | --------------- | -------- | --------- | ------ | -------- |
@@ -249,14 +251,22 @@ The dataset consists of 26 Thai songs (389 segments) selected based on:
 
 > **Note**: The still relatively high neutral percentage (45%) reflects the nature of Thai song lyrics, which often narrate stories or describe situations rather than directly express emotions—a characteristic feature of Thai songwriting.
 
-### Dataset Statistics
+### Dataset Statistics (From Database)
+
+Statistics may change based on database content. View latest statistics by:
+
+```bash
+python get_stats.py
+```
+
+Or visit the "Evaluation" page in the web application (`/evaluation`)
+
+**Example Statistics** (at time of documentation):
 
 - **Total Songs**: 26
-- **Total Segments**: 389
-- **Average Segments per Song**: 14.96
-- **Minimum Segments per Song**: 8
-- **Maximum Segments per Song**: 24
-- **Average Segment Length**: 127 characters
+- **Total Segments**: ~389
+- **Average Segments per Song**: ~15
+- **Average Segment Length**: ~127 characters
 
 ## 🔧 API Endpoints
 

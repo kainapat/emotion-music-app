@@ -8,9 +8,12 @@ endblock %} {% block content %}
 <!-- ตัวชี้วัดเชิงปริมาณ -->
 <div class="bg-white rounded-xl shadow p-6 mb-6">
   <h3 class="text-xl font-semibold mb-4">ตัวชี้วัดเชิงปริมาณ</h3>
-  <p class="text-gray-600 mb-4">
-    ประเมินด้วยชุดทดสอบ human annotation (20 เพลง, 150 ท่อน)
-  </p>
+  <div class="bg-amber-50 border-l-4 border-amber-400 p-4 mb-4 rounded-r-lg">
+    <p class="text-sm text-amber-800">
+      <strong>⚠️ หมายเหตุ:</strong> ตัวชี้วัดด้านล่างมาจาก subset ของชุดข้อมูล (20 เพลง, 150 ท่อน) ที่ได้รับการ annotation โดยผู้เชี่ยวชาญ 
+      ส่วนสถิติชุดข้อมูลด้านล่าง (จำนวนเพลง, ท่อน, การกระจายอารมณ์) ดึงจากฐานข้อมูลจริงแบบ real-time
+    </p>
+  </div>
 
   <div class="overflow-x-auto">
     <table class="min-w-full text-sm">
