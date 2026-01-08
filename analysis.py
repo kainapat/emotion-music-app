@@ -21,11 +21,11 @@ def plot_interactive_trajectory(emotions, song_name):
         font=dict(size=14, family="Arial, sans-serif"),  # เพิ่มขนาดฟอนต์และกำหนดฟอนต์
         title_font=dict(size=18, family="Arial, sans-serif"),  # ขนาดฟอนต์ชื่อกราฟ
         xaxis=dict(
-            titlefont=dict(size=16),  # ขนาดฟอนต์ชื่อแกน X
+            title=dict(font=dict(size=16)),  # ขนาดฟอนต์ชื่อแกน X
             tickfont=dict(size=13)    # ขนาดฟอนต์ตัวเลขแกน X
         ),
         yaxis=dict(
-            titlefont=dict(size=16),  # ขนาดฟอนต์ชื่อแกน Y
+            title=dict(font=dict(size=16)),  # ขนาดฟอนต์ชื่อแกน Y
             tickfont=dict(size=13)    # ขนาดฟอนต์ข้อความแกน Y
         ),
         hoverlabel=dict(
