@@ -203,15 +203,15 @@ Early versions had high neutral classification (63.5%). We developed several imp
 
 ### Selection Criteria
 
-The dataset consists of 26 Thai songs (389 segments) selected based on:
+The dataset consists of **50 Thai and International songs (620 segments)** selected based on:
 
 1. **Genre Diversity**:
 
-   - Pop: 10 songs (38%)
-   - Rock: 5 songs (19%)
-   - Indie: 6 songs (23%)
-   - Luk Thung: 3 songs (12%)
-   - Ballad: 2 songs (8%)
+   - Pop: ~40%
+   - Rock: ~20%
+   - Indie: ~20%
+   - Luk Thung/Ballad: ~10%
+   - International: ~10%
 
 2. **Emotion Diversity**:
 
@@ -228,27 +228,25 @@ The dataset consists of 26 Thai songs (389 segments) selected based on:
 
 | Emotion | Segment Count | Percentage |
 | ------- | ------------- | ---------- |
-| Neutral | 175           | 45.0%      |
-| Sad     | 52            | 13.4%      |
-| Happy   | 38            | 9.8%       |
-| Hope    | 24            | 6.2%       |
-| Calm    | 15            | 3.9%       |
-| Excited | 8             | 2.1%       |
-| Lonely  | 3             | 0.8%       |
-| Angry   | 2             | 0.5%       |
+| Neutral | 307           | 49.5%      |
+| Excited | 135           | 21.8%      |
+| Sad     | 78            | 12.6%      |
+| Lonely  | 31            | 5.0%       |
+| Happy   | 30            | 4.8%       |
+| Angry   | 21            | 3.4%       |
+| Hope    | 13            | 2.1%       |
+| Calm    | 5             | 0.8%       |
 
-**Total**: 317 non-neutral segments + 175 neutral segments after improvements
+**Total**: 620 segments from 50 songs (Thai + International)
 
-> **Note**: The still relatively high neutral percentage (45%) reflects the nature of Thai song lyrics, which often narrate stories or describe situations rather than directly express emotions—a characteristic feature of Thai songwriting.
+> **Note**: The relatively high neutral percentage (~50%) reflects the nature of song lyrics, which often narrate stories or describe situations rather than directly express emotions—a characteristic feature of songwriting.
 
 ### Dataset Statistics
 
-- **Total Songs**: 26
-- **Total Segments**: 389
-- **Average Segments per Song**: 14.96
-- **Minimum Segments per Song**: 8
-- **Maximum Segments per Song**: 24
-- **Average Segment Length**: 127 characters
+- **Total Songs**: 50 (Thai + International)
+- **Total Segments**: 620
+- **Average Segments per Song**: 12.4
+- **Average Segment Length**: ~120 characters
 
 ## 🔧 API Endpoints
 

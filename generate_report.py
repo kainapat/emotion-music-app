@@ -115,7 +115,7 @@ def create_report():
 
     # 4. Dataset Info
     doc.add_heading('4. องค์ประกอบของชุดข้อมูล (Dataset Composition)', level=1)
-    doc.add_paragraph('ชุดข้อมูลที่ใช้ในการศึกษาประกอบด้วยเพลงภาษาไทยจำนวน 26 เพลง โดยมีการกระจายตัวของประเภทเพลง (Genre Hetereogeneity) อย่างเหมาะสม (Pop 38%, Rock 19%, Indie 23%) เพื่อให้มั่นใจว่าผลการประเมินสามารถเป็นตัวแทนของข้อมูลในสภาพแวดล้อมจริง (Representativeness)')
+    doc.add_paragraph('ชุดข้อมูลที่ใช้ในการศึกษาประกอบด้วยเพลงไทยและเพลงสากลจำนวน 50 เพลง (620 ท่อน) โดยมีการกระจายตัวของประเภทเพลง (Genre Hetereogeneity) อย่างเหมาะสม (Pop ~40%, Rock ~20%, Indie ~20%, สากล ~10%) เพื่อให้มั่นใจว่าผลการประเมินสามารถเป็นตัวแทนของข้อมูลในสภาพแวดล้อมจริง (Representativeness)')
 
     # Footer
     section = doc.sections[0]
